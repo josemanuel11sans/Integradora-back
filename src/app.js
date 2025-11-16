@@ -2,6 +2,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 // configuración de Express y rutas
 const express = require("express");
@@ -14,6 +15,8 @@ const fileRoutes = require("./cloudinary/file.routes");
 // importa las rutas de tutores
 app.use(express.json());
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // límite global: 5 peticiones cada 15 min por IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
@@ -23,7 +26,7 @@ const limiter = rateLimit({
   legacyHeaders: false,  // desactiva headers antiguos
 });
 // aplica a TODAS las rutas
-app.use(limiter);
+// app.use(limiter);
 
 //seguridad básica
 // esta liena de código añade varias cabeceras HTTP para ayudar a proteger la aplicación de algunas vulnerabilidades web conocidas.
