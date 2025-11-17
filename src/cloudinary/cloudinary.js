@@ -1,4 +1,5 @@
 // src/config/cloudinary.js
+// configuracion de cloudinary con las credenciales en el .env
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 

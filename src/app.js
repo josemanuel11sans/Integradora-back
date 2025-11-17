@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
+require("./utils/associations");
 
 // configuración de Express y rutas
 const express = require("express");
