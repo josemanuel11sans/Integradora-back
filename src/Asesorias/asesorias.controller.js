@@ -30,8 +30,6 @@ const create = async (req, res, next) => {
   try {
     const nuevaAsesoria = await asesoriasService.createAsesoria(req.body);
     //oculta el password
-     const { password, ...safe } = nuevaAsesoria.toJSON();
-    // Llama al servicio para crear un nuevo asesoria con los datos del body
     res.status(201).json(nuevaAsesoria); 
     // Devuelve el asesoria creado con código 201 (Created)
   } catch (err) { next(err); } 
@@ -62,5 +60,53 @@ const remove = async (req, res, next) => {
   // Manejo de errores
 };
 
-module.exports = { list, getOne, create, update, remove }; 
+
+// Consultas especificas
+// ------------Estudiante-------------
+
+// Crear una asesoria
+
+const createAsesoriaByStudent = async (req, res, next) => {
+  try {
+    const { estudiante_id } = req.params;
+    const {
+      comentarios,
+      tutor_id,
+      espacio_id,
+      fecha_asesoria,
+      carrera_id
+    } = req.body;
+
+    const nuevaAsesoria = await asesoriasService.createAsesoriaByStudent(
+      parseInt(estudiante_id, 10),
+      {
+        comentarios,
+        tutor_id,
+        espacio_id,
+        fecha_asesoria,
+        carrera_id
+      }
+    );
+
+    res.status(201).json(nuevaAsesoria);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Obtener asesorias por estudiante
+const getAsesoriasByStudent = async (req, res, next) => {
+  try {
+    const estudiante_id = req.params.estudiante_id;
+    const asesorias = await asesoriasService.getAsesoriasByStudent(estudiante_id);
+    if (asesorias.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron asesorías para este estudiante' });
+    }
+    res.json(asesorias);
+  } catch (err) { next(err); }
+}
+
+module.exports = { list, getOne, create, update, remove,
+createAsesoriaByStudent, getAsesoriasByStudent
+}; 
 // Exporta todas las funciones del controlador para ser usadas en las rutas

@@ -16,12 +16,6 @@ const getById = async (id) => {
 };
 
 const createAsesoria = async (data) => {
-  // Verificar si ya existe un Asesoria con el mismo PENDIENTE
-  const existe = await Asesoria.findOne({ where: { email: data.email } });
-  if (existe) {
-    throw new Error('Ya existe un Asesoria con ese identificador');
-  }
-
   return await Asesoria.create(data); 
   // Crea un nuevo Asesoria con los datos proporcionados
 };
@@ -46,5 +40,30 @@ const deleteAsesoria = async (id) => {
   // Devuelve el Asesoria eliminado
 };
 
-module.exports = { getAll, getById, createAsesoria, updateAsesoria, deleteAsesoria }; 
+
+// Consultas especificas
+// ------------Estudiante-------------
+
+// Crear una asesoria
+const createAsesoriaByStudent = async (estudiante_id, data) => {
+  return await Asesoria.create({
+    ...data,                 // comentarios, tutor_id, espacio_id, fecha_asesoria, carrera_id
+    estudiante_id,           // forzamos que el id venga del params
+    asistencia: false        // siempre false al crear
+  });
+};
+
+// Obtener asesorias por estudiante
+
+const getAsesoriasByStudent = async (studentId) => {
+  return await Asesoria.findAll({
+    where: { estudiante_id: studentId },
+    order: [['fecha_asesoria', 'DESC']]
+  });
+};
+
+
+module.exports = { getAll, getById, createAsesoria, updateAsesoria, deleteAsesoria, 
+createAsesoriaByStudent, getAsesoriasByStudent 
+}; 
 // Exporta todas las funciones del servicio

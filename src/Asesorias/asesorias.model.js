@@ -1,7 +1,8 @@
 /*
-👨‍🏫 Asesorías
+Asesorías
     Estudiante
         **Registrar el motivo de la asesoría al reservar.
+        ** Registrar de que materia, con que profesor y en que espacio se realizará la asesoría.
         **Ver historial de asesorías realizadas.
     Tutor académico
         **Registrar notas/comentarios de la asesoría.
@@ -24,21 +25,6 @@ Asesorias.init({
     primaryKey: true, // Clave primaria
     autoIncrement: true // Se incrementa automáticamente
   },
-  nombre: {
-    type: DataTypes.STRING, // Tipo texto
-    allowNull: false, // No puede ser nulo
-    validate: {
-      notEmpty: { msg: "El nombre no puede estar vacío" }, // Validación: no vacío
-      len: { args: [2, 100], msg: "El nombre debe tener entre 2 y 100 caracteres" } // Validación: longitud
-    }
-  },
-  motivo: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      len: { args: [2, 100], msg: "El motivo debe tener entre 2 y 100 caracteres" }
-    }
-  },
   comentarios: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -46,15 +32,31 @@ Asesorias.init({
       len: { args: [2, 500], msg: "El motivo puede tener entre 2 y 500 caracteres" }
     }
   },
+  espacio_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  estudiante_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  tutor_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  fecha_asesoria:{
+    type: DataTypes.DATE,
+    allowNull: false
+  },
   asistencia:{
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false
   },
-  // carrera_id: {
-  //   type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
-  //   allowNull: true
-  // },
+  carrera_id: {
+    type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
+    allowNull: true
+  },
 }, {
   sequelize, // Conecta con la instancia de Sequelize
   modelName: 'Asesoria', // Nombre del modelo

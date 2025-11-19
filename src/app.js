@@ -13,6 +13,7 @@ const app = express();
 const tutorRoutes = require("./Usuarios/usuarios.routes");
 const authRoutes = require("./auth/auth.routes");
 const fileRoutes = require("./cloudinary/file.routes");
+const asesoriasRoutes = require("./Asesorias/asesorias.routes");
 // importa las rutas de tutores
 app.use(express.json());
 
@@ -43,6 +44,7 @@ app.use(morgan("dev")); // log de peticiones
 app.use("/api", tutorRoutes);
 app.use("/api", authRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/asesorias",asesoriasRoutes);
 
 // middleware de errores sencillo
 app.use((err, req, res, next) => {
