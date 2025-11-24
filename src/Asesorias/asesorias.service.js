@@ -1,10 +1,6 @@
 const Asesoria = require('./asesorias.model'); 
 // Importa el modelo Asesoria
 
-// Asesorias.service.js -> createAsesoria
-const bcrypt = require('bcrypt');
-const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
-
 const getAll = async () => {
   return await Asesoria.findAll(); 
   // Devuelve todos los Asesorias de la base de datos

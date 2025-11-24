@@ -25,6 +25,11 @@ Asesorias.init({
     primaryKey: true, // Clave primaria
     autoIncrement: true // Se incrementa automáticamente
   },
+  activo: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    allowNull: false
+  },
   comentarios: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -54,7 +59,7 @@ Asesorias.init({
     allowNull: false
   },
   carrera_id: {
-    type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
+    type: DataTypes.INTEGER,
     allowNull: true
   },
 }, {
