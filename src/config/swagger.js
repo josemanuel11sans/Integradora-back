@@ -7,19 +7,26 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API - Mi Sistema de Tutores",
+      title: "API - TutorHub",
       version: "1.0.0",
-      description: "Documentación de la API del sistema de tutores",
+      description: "Documentación de la API de TutorHub",
     },
     components: {
-      bearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
       },
     },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ["./src/**/*.routes.js"], // <-- aquí Swagger buscará anotaciones NOTA no cambiar
+  apis: ["./src/**/*.routes.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
