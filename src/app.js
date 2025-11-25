@@ -7,14 +7,15 @@ require("./utils/associations");
 
 // configuración de Express y rutas
 const express = require("express");
-// importa express
+// instancia de express
 const app = express();
 // instancia de express
 const tutorRoutes = require("./Usuarios/usuarios.routes");
 const authRoutes = require("./auth/auth.routes");
 const fileRoutes = require("./cloudinary/file.routes");
 const asesoriasRoutes = require("./Asesorias/asesorias.routes");
-// importa las rutas de tutores
+const espaciosRoutes = require("./Espacios/espacios.routes");
+
 app.use(express.json());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -44,7 +45,8 @@ app.use(morgan("dev")); // log de peticiones
 app.use("/api", tutorRoutes);
 app.use("/api", authRoutes);
 app.use("/api/files", fileRoutes);
-app.use("/api/asesorias",asesoriasRoutes);
+app.use("/api/asesorias", asesoriasRoutes);
+app.use("/api", espaciosRoutes); // ⭐ AGREGAR ESTA LÍNEA
 
 // middleware de errores sencillo
 app.use((err, req, res, next) => {

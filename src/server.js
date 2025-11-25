@@ -1,5 +1,6 @@
 // src/server.js
 require('dotenv').config();
+
 const app = require('./app');
 const { sequelize, createDatabaseIfNotExists } = require('./config/db');
 const PORT = process.env.PORT || 3000;
