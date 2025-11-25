@@ -34,11 +34,15 @@ const limiter = rateLimit({
 // esta liena de código añade varias cabeceras HTTP para ayudar a proteger la aplicación de algunas vulnerabilidades web conocidas.
 app.use(helmet()); // cabeceras seguras
 // CORS - ajustar según necesidades
+// Permitir CUALQUIER origen
 app.use(cors({
-  origin: "http://localhost:5173", // frontend
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+// Necesario para que Express responda los OPTIONS sin fallar
+// app.options("*", cors());
+
 // permite solo solicitudes desde este origen
 app.use(express.json());
 // parsea JSON en body
