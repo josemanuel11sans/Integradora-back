@@ -51,11 +51,3 @@ Espacio.init({
 });
 
 module.exports = Espacio;
-
-/*
-Según el DFR - Módulo 3: Rol Tutor
-    ✅ 3.1 Registro de espacios (nombre, descripción, portada)
-    ✅ 3.2 Editar espacios
-    ✅ 3.3 Visualización de espacios
-    ✅ 3.4 Eliminar espacios (con validaciones de reservas/materiales)
-*/

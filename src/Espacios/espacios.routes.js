@@ -234,22 +234,3 @@ router.delete(
 );
 
 module.exports = router;
-
-/*
-Protecciones implementadas según DFR - Módulo 3:
-  ✅ 3.1 Registro de espacios: Solo 'tutor' y 'admin'
-  ✅ 3.2 Editar espacios: Solo 'tutor' y 'admin'
-  ✅ 3.3 Visualización de espacios: Todos los usuarios autenticados
-  ✅ 3.4 Eliminar espacios: Solo 'tutor' y 'admin' (con validación de dependencias)
-  
-Roles disponibles según usuarios.model.js:
-  - 'student' (Estudiante)
-  - 'tutor' (Tutor)
-  - 'coordinator' (Coordinador)
-  - 'admin' (Administrador)
-  
-Funcionalidades adicionales:
-  - Búsqueda de espacios por nombre (DFR 3.3)
-  - Listar espacios por tutor
-  - Soft delete para mantener historial
-*/
