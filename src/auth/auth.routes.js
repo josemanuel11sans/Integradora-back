@@ -35,5 +35,35 @@ const authController = require("./auth.controller");
  *         description: Credenciales inválidas.
  */
 router.post("/auth/login", authController.login);
+// tuta para logue con google
+router.post("/auth/google", authController.loginGoogle);
 
 module.exports = router;
+
+// guia para consumir desde el front
+// en el front se optiene un token de google usando
+// - Gogle indetity Service (nuevo)
+// - O bien el Gogle Oaut Clasico
+// google.accounts.id.initialize({
+//   client_id: "TU_CLIENT_ID",
+//   callback: handleCredentialResponse,
+// });
+
+// google.accounts.id.renderButton(document.getElementById("buttonDiv"), {
+//   theme: "outline",
+//   size: "large",
+// });
+// Cuando gogle devuelva el token
+// async function handleCredentialResponse(response) {
+//   const tokenGoogle = response.credential;
+
+//   const backend = await fetch("/api/auth/google", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ token: tokenGoogle }),
+//   });
+
+//   const data = await backend.json();
+//   console.log(data);
+// }
+// 👉 https://developers.google.com/oauthplayground
