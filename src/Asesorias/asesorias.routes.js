@@ -12,6 +12,9 @@ const authorizeRoles = require('../auth/middlewares/authorizeRoles');
 // Crear una asesoria
 router.post('/student/:estudiante_id/create', asesoriaController.create);
 
+// Obtener todas las asesorias test
+router.get('/', asesoriaController.getAll);
+
 // Obtener asesorias por estudiante
 router.get('/student/:estudiante_id', asesoriaController.getByStudent);
 

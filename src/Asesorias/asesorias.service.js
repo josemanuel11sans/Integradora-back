@@ -1,9 +1,27 @@
 const Asesoria = require('./asesorias.model'); 
+
+// Modelos que tienen relacion con asesorias
+const Carrera = require('../Carreras/carreras.model');
+const Usuario = require('../Usuarios/usuarios.model');
 // Importa el modelo Asesoria
 
 const getAll = async () => {
-  return await Asesoria.findAll(); 
-  // Devuelve todos los Asesorias de la base de datos
+  return await Asesoria.findAll({
+    where: { activo: true },
+    include: [
+      {
+        model: Carrera,
+        as: 'carrera',
+        attributes: ['id_carrera', 'nombre_carrera']
+      },
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      }
+    ],
+    order: [['fecha_asesoria', 'DESC']]
+  });
 };
 
 const getById = async (id) => {
@@ -62,6 +80,23 @@ FPK: estudiante_id
 const getAsesoriasByStudent = async (studentId) => {
   return await Asesoria.findAll({
     where: { estudiante_id: studentId },
+    include: [
+      {
+        model: Usuario,
+        as: 'estudiante',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Carrera,
+        as: 'carrera',
+        attributes: ['id_carrera', 'nombre_carrera']
+      }
+    ],
     order: [['fecha_asesoria', 'DESC']]
   });
 };
@@ -75,9 +110,21 @@ FPK: tutor_id
 const getAsesoriasByTutor = async (tutorId) => {
   return await Asesoria.findAll({
     where: { tutor_id: tutorId },
+    include: [
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Carrera,
+        as: 'carrera',
+        attributes: ['id_carrera', 'nombre_carrera']
+      }
+    ],
     order: [['fecha_asesoria', 'DESC']]
   });
-}
+};
 
 /*
 Obtener asesorias por materia
@@ -99,6 +146,13 @@ FPK: carrera_id
 const getAsesoriasByCarrera = async (carreraId) => {
   return await Asesoria.findAll({
     where: { carrera_id: carreraId },
+    include: [
+      {
+        model: Carrera,
+        as: 'carrera',
+        attributes: ['id_carrera', 'nombre_carrera']
+      }
+    ],
     order: [['fecha_asesoria', 'DESC']]
   });
 }

@@ -1,7 +1,18 @@
 // el controller se encarga de recibir las peticiones, procesarlas y devolver una respuesta adecuada
 
+const { get } = require('./asesorias.routes');
 const asesoriasService = require('./asesorias.service'); 
 // Importa las funciones del servicio de asesorias, que interactúan con la base de datos
+
+const getAll = async (req, res, next) => {
+  try {
+    const asesorias = await asesoriasService.getAll();
+    // Llama al servicio para obtener todos los asesorias
+    res.json(asesorias);
+    // Devuelve la lista de asesorias en formato JSON
+  } catch (err) { next(err); }
+  // Si ocurre un error, lo pasa al middleware de manejo de errores
+}
 
 const list = async (req, res, next) => {
   try {
@@ -163,6 +174,6 @@ const getByCarrera = async (req, res, next) => {
 }
 
 module.exports = { list, getOne, create, update, remove,
-getByStudent, getByTutor, getByMateria, getByCarrera
+getByStudent, getByTutor, getByMateria, getByCarrera, getAll
 }; 
 // Exporta todas las funciones del controlador para ser usadas en las rutas
