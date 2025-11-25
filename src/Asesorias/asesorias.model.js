@@ -37,10 +37,6 @@ Asesorias.init({
       len: { args: [2, 500], msg: "El motivo puede tener entre 2 y 500 caracteres" }
     }
   },
-  espacio_id:{
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
   estudiante_id:{
     type: DataTypes.INTEGER,
     allowNull: false

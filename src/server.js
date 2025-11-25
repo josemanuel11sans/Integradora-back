@@ -1,6 +1,6 @@
 // src/server.js
 require('dotenv').config();
-require('./associations'); // Asegura que las asociaciones se configuren
+require('../src/utils/associations'); // Asegura que las asociaciones se configuren
 const app = require('./app');
 const { sequelize, createDatabaseIfNotExists } = require('./config/db');
 const PORT = process.env.PORT || 3000;

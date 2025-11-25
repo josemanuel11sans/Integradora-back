@@ -10,22 +10,22 @@ const authorizeRoles = require('../auth/middlewares/authorizeRoles');
 
 
 // Crear una asesoria
-router.post('/student/:estudiante_id/create', asesoriaController.create);
+router.post('/student/:estudiante_id/create',authenticate, authorizeRoles('student','coordinator'), asesoriaController.create);
 
 // Obtener todas las asesorias test
-router.get('/', asesoriaController.getAll);
+router.get('/', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getAll);
 
 // Obtener asesorias por estudiante
-router.get('/student/:estudiante_id', asesoriaController.getByStudent);
+router.get('/student/:estudiante_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByStudent);
 
 // Obtener asesorias por tutor
-router.get('/tutor/:tutor_id', asesoriaController.getByTutor);
+router.get('/tutor/:tutor_id', authenticate, authorizeRoles('tutor', 'coordinator'), asesoriaController.getByTutor);
 
 // Obtener asesorias por materia
-router.get('/materia/:materia_id', asesoriaController.getByMateria);
+router.get('/materia/:materia_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByMateria);
 
 // Obtener asesorias por carrera
-router.get('/carrera/:carrera_id', asesoriaController.getByCarrera);
+router.get('/carrera/:carrera_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByCarrera);
 
 module.exports = router; 
 // Exporta el router para usarlo en la app principal
