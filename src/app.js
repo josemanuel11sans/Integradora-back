@@ -15,6 +15,7 @@ const authRoutes = require("./auth/auth.routes");
 const fileRoutes = require("./cloudinary/file.routes");
 const asesoriasRoutes = require("./Asesorias/asesorias.routes");
 const carrerasRoutes = require("./Carreras/carreras.routes");
+const materiasRoutes = require("./materias/materias.routes");
 // importa las rutas de tutores
 app.use(express.json());
 
@@ -55,6 +56,7 @@ app.use("/api", authRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/asesorias",asesoriasRoutes);
 app.use("/api/carreras", carrerasRoutes);
+app.use("/api/materias", materiasRoutes);
 
 // middleware de errores sencillo
 app.use((err, req, res, next) => {

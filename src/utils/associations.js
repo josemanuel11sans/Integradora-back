@@ -3,6 +3,7 @@ const File = require("../cloudinary/clud.model");
 const Espacio = require("../Espacios/espacios.model");
 const Asesoria = require('../Asesorias/asesorias.model');
 const Carrera = require('../Carreras/carreras.model');
+const Materia = require('../materias/materias.model');
 
 
 // Relación Usuario - File
@@ -60,4 +61,15 @@ Asesoria.belongsTo(Usuario, {
   as: 'estudiante'
 });
 
-module.exports = { Usuario, File, Espacio, Asesoria, Carrera};
+//Relación Carrera 1 --- N Materias
+Carrera.hasMany(Materia, {
+  foreignKey: 'carrera_id',
+  as: 'materias'
+});
+
+Materia.belongsTo(Carrera, {
+  foreignKey: 'carrera_id',
+  as: 'carrera'
+});
+
+module.exports = { Usuario, File, Espacio, Asesoria, Carrera, Materia };
