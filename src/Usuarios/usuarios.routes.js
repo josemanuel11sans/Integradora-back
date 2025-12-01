@@ -34,7 +34,7 @@ const authorizeRoles = require('../auth/middlewares/authorizeRoles');
  *       403:
  *         description: No autorizado.
  */
-router.get('/usuarios/all',authenticate, authorizeRoles('admin','coordinador'), usuarioController.list); 
+router.get('/usuarios/all',authenticate, authorizeRoles('admin','coordinator'), usuarioController.list); 
 // Ruta GET para obtener todos los usuarios
 
 /**

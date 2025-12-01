@@ -31,7 +31,7 @@ Usuario.init({
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true, // Debe ser único
+    // unique: true,
     validate: { isEmail: true } // Validación de formato de correo
   },
   telefono: {

@@ -12,14 +12,21 @@ const options = {
       description: "Documentación de la API de TutorHub",
     },
     components: {
-      bearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
       },
     },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ["./src/**/*.routes.js"], // <-- aquí Swagger buscará anotaciones NOTA no cambiar
+  apis: ["./src/**/*.routes.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

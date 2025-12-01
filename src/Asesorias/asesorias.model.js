@@ -25,16 +25,17 @@ Asesorias.init({
     primaryKey: true, // Clave primaria
     autoIncrement: true // Se incrementa automáticamente
   },
+  activo: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    allowNull: false
+  },
   comentarios: {
     type: DataTypes.STRING,
     allowNull: true,
     validate: {
       len: { args: [2, 500], msg: "El motivo puede tener entre 2 y 500 caracteres" }
     }
-  },
-  espacio_id:{
-    type: DataTypes.INTEGER,
-    allowNull: false
   },
   estudiante_id:{
     type: DataTypes.INTEGER,
@@ -54,7 +55,7 @@ Asesorias.init({
     allowNull: false
   },
   carrera_id: {
-    type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
+    type: DataTypes.INTEGER,
     allowNull: true
   },
 }, {
