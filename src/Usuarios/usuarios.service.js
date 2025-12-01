@@ -30,6 +30,15 @@ const createUsuario = async (data) => {
   // Crea un nuevo usuario con los datos proporcionados
 };
 
+//createEstudiante, si el rol es student, asignar carrera_id
+const createEstudiante = async (data) => {
+  if (data.role !== 'student') {
+    throw new Error('El rol debe ser student para crear un estudiante');
+  }
+  return await Usuario.create(data);
+};
+
+
 const updateUsuario = async (id, data) => {
   const usuario = await Usuario.findByPk(id); 
   // Busca el usuario a actualizar

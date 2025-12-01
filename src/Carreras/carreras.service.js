@@ -12,18 +12,21 @@ const getById = async (id) => {
 };
 
 const createCarrera = async (data) => {
+  if (!data.nombre_carrera) throw new Error("Nombre de carrera requerido");
   return await Carrera.create(data);
 };
 
 const updateCarrera = async (id, data) => {
   const carrera = await Carrera.findByPk(id);
   if (!carrera || !carrera.activo) throw new Error('Carrera not found');
+
   return await carrera.update(data);
 };
 
 const deleteCarrera = async (id) => {
   const carrera = await Carrera.findByPk(id);
   if (!carrera || !carrera.activo) throw new Error('Carrera not found');
+
   await carrera.update({ activo: false });
   return carrera;
 };

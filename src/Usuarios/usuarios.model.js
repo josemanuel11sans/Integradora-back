@@ -58,11 +58,15 @@ Usuario.init({
     type: DataTypes.ENUM('student','tutor','coordinator','admin'),
     defaultValue: 'student',
     allowNull: false
+  },//carrera solo para el rol de student
+  carrera_id: {
+    type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
+    allowNull: true,
+     references: {
+      model: 'carreras',
+      key: 'id_carrera'
+    }
   },
-  // carrera_id: {
-  //   type: DataTypes.INTEGER, // FK opcional si coordinador pertenece a una carrera
-  //   allowNull: true
-  // },
 }, {
   sequelize, // Conecta con la instancia de Sequelize
   modelName: 'Usuario', // Nombre del modelo

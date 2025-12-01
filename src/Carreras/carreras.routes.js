@@ -18,7 +18,7 @@ router.get('/', carreraController.list);
 router.get('/:id', carreraController.getOne);
 
 //actualizar una carrera por id
-router.put('/:id', carreraController.update);
+router.put('/update/:id', carreraController.update);
 
 //eliminar una carrera por id
 router.delete('/:id', carreraController.remove);
