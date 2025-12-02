@@ -1,7 +1,8 @@
 const Asesoria = require('./asesorias.model'); 
+const Carrera = require('../Carreras/carreras.model');
 
 // Modelos que tienen relacion con asesorias
-const Carrera = require('../Carreras/carreras.model');
+const Materia = require('../materias/materias.model');
 const Usuario = require('../Usuarios/usuarios.model');
 // Importa el modelo Asesoria
 
@@ -10,14 +11,14 @@ const getAll = async () => {
     where: { activo: true },
     include: [
       {
-        model: Carrera,
-        as: 'carrera',
-        attributes: ['id_carrera', 'nombre_carrera']
-      },
-      {
-        model: Usuario,
-        as: 'tutor',
-        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+        model: Materia,
+        as: 'materia',
+        include: [
+          {
+            model: Carrera,
+            as: 'carrera'
+          }
+        ]
       }
     ],
     order: [['fecha_asesoria', 'DESC']]
@@ -92,9 +93,14 @@ const getAsesoriasByStudent = async (studentId) => {
         attributes: ['id_usuario', 'nombre', 'apellido', 'email']
       },
       {
-        model: Carrera,
-        as: 'carrera',
-        attributes: ['id_carrera', 'nombre_carrera']
+        model: Materia,
+        as: 'materia',
+        include: [
+          {
+            model: Carrera,
+            as: 'carrera'
+          }
+        ]
       }
     ],
     order: [['fecha_asesoria', 'DESC']]
@@ -117,9 +123,14 @@ const getAsesoriasByTutor = async (tutorId) => {
         attributes: ['id_usuario', 'nombre', 'apellido', 'email']
       },
       {
-        model: Carrera,
-        as: 'carrera',
-        attributes: ['id_carrera', 'nombre_carrera']
+        model: Materia,
+        as: 'materia',
+        include: [
+          {
+            model: Carrera,
+            as: 'carrera'
+          }
+        ]
       }
     ],
     order: [['fecha_asesoria', 'DESC']]
@@ -134,7 +145,14 @@ FPK: materia_id
 const getAsesoriasByMateria = async (materiaId) => {
   return await Asesoria.findAll({
     where: { materia_id: materiaId },
-    order: [['fecha_asesoria', 'DESC']]
+    order: [['fecha_asesoria', 'DESC']],
+    include: [
+      {
+        model: Materia,
+        as: 'materia',
+        attributes: ['id_materia', 'nombre_materia']
+      }
+    ]
   });
 };
 
@@ -145,21 +163,43 @@ FPK: carrera_id
 */
 const getAsesoriasByCarrera = async (carreraId) => {
   return await Asesoria.findAll({
-    where: { carrera_id: carreraId },
     include: [
       {
-        model: Carrera,
-        as: 'carrera',
-        attributes: ['id_carrera', 'nombre_carrera']
+        model: Materia,
+        as: 'materia',
+        required: true, // filtra asesorías por carrera
+        attributes: ['id_materia', 'nombre_materia'],
+        include: [
+          {
+            model: Carrera,
+            as: 'carrera',
+            attributes: ['id_carrera', 'nombre_carrera'],
+            where: { id_carrera: carreraId }
+          }
+        ]
+      },
+
+      // Estudiante
+      {
+        model: Usuario,
+        as: 'estudiante',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+
+      // Tutor
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
       }
     ],
     order: [['fecha_asesoria', 'DESC']]
   });
-}
+};
 
 
 module.exports = { getAll, getById, createAsesoria, updateAsesoria, deleteAsesoria,
-getAsesoriasByStudent, getAsesoriasByTutor, getAsesoriasByMateria,
-getAsesoriasByCarrera,
+getAsesoriasByStudent, getAsesoriasByTutor, getAsesoriasByMateria, getAsesoriasByMateria,
+getAsesoriasByCarrera
 }; 
 // Exporta todas las funciones del servicio

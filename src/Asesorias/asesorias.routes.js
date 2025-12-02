@@ -27,6 +27,9 @@ router.get('/materia/:materia_id', authenticate, authorizeRoles('student','tutor
 // Obtener asesorias por carrera
 router.get('/carrera/:carrera_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByCarrera);
 
+// Obtener asesorias por materia
+router.get('/materia/:materia_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByMateria);
+
 module.exports = router; 
 // Exporta el router para usarlo en la app principal
 

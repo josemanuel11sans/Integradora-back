@@ -54,7 +54,7 @@ Asesorias.init({
     defaultValue: false,
     allowNull: false
   },
-  carrera_id: {
+  materia_id: {
     type: DataTypes.INTEGER,
     allowNull: true
   },

@@ -174,6 +174,6 @@ const getByCarrera = async (req, res, next) => {
 }
 
 module.exports = { list, getOne, create, update, remove,
-getByStudent, getByTutor, getByMateria, getByCarrera, getAll
+getByStudent, getByTutor, getByMateria, getAll, getByMateria, getByCarrera
 }; 
 // Exporta todas las funciones del controlador para ser usadas en las rutas

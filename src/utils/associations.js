@@ -27,18 +27,6 @@ Espacio.belongsTo(Usuario, {
   as: "tutor",
 });
 
-// Carrera 1 ---< N Asesorías
-Carrera.hasMany(Asesoria, {
-  foreignKey: 'carrera_id',
-  as: 'asesorias'
-});
-
-Asesoria.belongsTo(Carrera, {
-  foreignKey: 'carrera_id',
-  as: 'carrera'
-});
-
-
 // Tutor 1 ---< N Asesorías
 Usuario.hasMany(Asesoria, {
   foreignKey: 'tutor_id',
@@ -71,5 +59,17 @@ Materia.belongsTo(Carrera, {
   foreignKey: 'carrera_id',
   as: 'carrera'
 });
+
+//Relación Materia 1 --- N Asesorías
+Materia.hasMany(Asesoria, {
+  foreignKey: 'materia_id',
+  as: 'asesorias'
+});
+
+Asesoria.belongsTo(Materia, {
+  foreignKey: 'materia_id',
+  as: 'materia'
+});
+
 
 module.exports = { Usuario, File, Espacio, Asesoria, Carrera, Materia };
