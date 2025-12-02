@@ -17,6 +17,7 @@ const asesoriasRoutes = require("./Asesorias/asesorias.routes");
 const carrerasRoutes = require("./Carreras/carreras.routes");
 const materiasRoutes = require("./materias/materias.routes");
 const espaciosRoutes = require("./Espacios/espacios.routes");
+const edificiosRoutes = require("./edificios/edificios.routes");
 // importa las rutas de tutores
 app.use(express.json());
 
@@ -59,6 +60,7 @@ app.use("/api/asesorias",asesoriasRoutes);
 app.use("/api/carreras", carrerasRoutes);
 app.use("/api/materias", materiasRoutes);
 app.use("/api/espacios", espaciosRoutes);
+app.use("/api/edificios", edificiosRoutes);
 
 // middleware de errores sencillo
 app.use((err, req, res, next) => {
