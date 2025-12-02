@@ -62,7 +62,30 @@ router.get('/usuarios/all',authenticate, authorizeRoles('admin','coordinator'), 
  *       403:
  *         description: No autorizado
  */
-router.get('/usuarios/id/:id',authenticate,authorizeRoles('coordinador'), usuarioController.getOne); 
+
+
+/**
+ * @swagger
+ * /api/usuarios/role/{role}:
+ *   get:
+ *     summary: Obtener usuarios por rol
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: role
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Rol del usuario (coordinator, student, tutor, admin)
+ *     responses:
+ *       200:
+ *         description: Lista de usuarios con el rol especificado
+ */
+router.get('/usuarios/role/:role', authenticate, authorizeRoles('admin','coordinator'), usuarioController.getByRole);
+
+router.get('/usuarios/id/:id',authenticate,authorizeRoles('coordinator'), usuarioController.getOne); 
 // Ruta GET para obtener un usuario por id
 
 /**

@@ -15,6 +15,8 @@ const getById = async (id) => {
   // Busca un usuario por su primary key
 };
 
+
+
 const createUsuario = async (data) => {
   // Verificar si ya existe un usuario con el mismo email
   const existe = await Usuario.findOne({ where: { email: data.email } });
@@ -59,5 +61,12 @@ const deleteUsuario = async (id) => {
   // Devuelve el usuario eliminado
 };
 
-module.exports = { getAll, getById, createUsuario, updateUsuario, deleteUsuario }; 
-// Exporta todas las funciones del servicio
+const getByRole = async (role) => {
+  return await Usuario.findAll({ 
+    where: { role },
+    attributes: { exclude: ['password'] } // Excluye el password de la respuesta
+  });
+};
+
+// Actualiza la exportación:
+module.exports = { getAll, getById, createUsuario, updateUsuario, deleteUsuario, getByRole };
