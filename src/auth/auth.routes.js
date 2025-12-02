@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("./auth.controller");
+const passwordResetController = require("./passwordReset/passwordReset.controller");
+const {
+  requestReset,
+  confirmReset
+} = require("./passwordReset/passwordReset.controller");
+
 /**
  * @swagger
  * tags:
@@ -37,6 +43,13 @@ const authController = require("./auth.controller");
 router.post("/auth/login", authController.login);
 // tuta para logue con google
 router.post("/auth/google", authController.loginGoogle);
+
+// 1. Solicitar correo
+router.post("/request-reset", passwordResetController.requestReset);
+// 2. Confirmar nueva contraseña
+router.post("/auth/password/verify-code", passwordResetController.verifyCode);
+// 3.- Resetear contraseña
+router.post("/auth/password/reset", passwordResetController.resetPassword);
 
 module.exports = router;
 
