@@ -150,7 +150,7 @@ router.get('/espacios/id/:id', authenticate, espaciosController.getOne);
 router.post(
   '/espacios/create',
   authenticate,
-  authorizeRoles('tutor', 'admin'),
+  authorizeRoles('tutor', 'admin', 'coordinator'),
   espaciosController.create
 );
 
@@ -232,5 +232,6 @@ router.delete(
   authorizeRoles('tutor', 'admin'),
   espaciosController.remove
 );
+
 
 module.exports = router;

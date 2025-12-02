@@ -3,6 +3,8 @@ require('dotenv').config();
 require('../src/utils/associations'); // Asegura que las asociaciones se configuren
 const app = require('./app');
 const { sequelize, createDatabaseIfNotExists } = require('./config/db');
+
+require("./config/associations")
 const PORT = process.env.PORT || 3000;
 
 const start = async () => {

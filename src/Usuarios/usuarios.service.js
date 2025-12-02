@@ -15,6 +15,8 @@ const getById = async (id) => {
   // Busca un usuario por su primary key
 };
 
+
+
 const createUsuario = async (data) => {
   // Verificar si ya existe un usuario con el mismo email
   const existe = await Usuario.findOne({ where: { email: data.email } });
@@ -29,6 +31,15 @@ const createUsuario = async (data) => {
   return await Usuario.create(data); 
   // Crea un nuevo usuario con los datos proporcionados
 };
+
+//createEstudiante, si el rol es student, asignar carrera_id
+const createEstudiante = async (data) => {
+  if (data.role !== 'student') {
+    throw new Error('El rol debe ser student para crear un estudiante');
+  }
+  return await Usuario.create(data);
+};
+
 
 const updateUsuario = async (id, data) => {
   const usuario = await Usuario.findByPk(id); 
@@ -50,5 +61,12 @@ const deleteUsuario = async (id) => {
   // Devuelve el usuario eliminado
 };
 
-module.exports = { getAll, getById, createUsuario, updateUsuario, deleteUsuario }; 
-// Exporta todas las funciones del servicio
+const getByRole = async (role) => {
+  return await Usuario.findAll({ 
+    where: { role },
+    attributes: { exclude: ['password'] } // Excluye el password de la respuesta
+  });
+};
+
+// Actualiza la exportación:
+module.exports = { getAll, getById, createUsuario, updateUsuario, deleteUsuario, getByRole };

@@ -13,7 +13,6 @@ const list = async (req, res, next) => {
   } catch (err) { next(err); } 
   // Si ocurre un error, lo pasa al middleware de manejo de errores
 };
-
 const getOne = async (req, res, next) => {
   try {
     const usuario = await usuariosService.getById(req.params.id); 
@@ -62,5 +61,14 @@ const remove = async (req, res, next) => {
   // Manejo de errores
 };
 
-module.exports = { list, getOne, create, update, remove }; 
-// Exporta todas las funciones del controlador para ser usadas en las rutas
+const getByRole = async (req, res, next) => {
+  try {
+    const usuarios = await usuariosService.getByRole(req.params.role);
+    res.json(usuarios);
+  } catch (err) { 
+    next(err); 
+  }
+};
+
+// Actualiza la exportación:
+module.exports = { list, getOne, create, update, remove, getByRole };
