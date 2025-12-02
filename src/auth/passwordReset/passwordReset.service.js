@@ -28,11 +28,96 @@ const sendResetCode = async (email) => {
     to: email,
     subject: "Código para recuperar tu contraseña",
     html: `
-      <h2>Tu código de recuperación</h2>
-      <p>Usa este código para restablecer tu contraseña:</p>
-      <h1 style="font-size: 32px; letter-spacing: 4px;">${code}</h1>
-      <p>Expira en 10 minutos.</p>
-    `,
+  <div style="
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    padding: 40px 0;
+  ">
+    <div style="
+      max-width: 520px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 35px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    ">
+      <h2 style="
+        color: #1f2d59;
+        text-align: center;
+        font-size: 26px;
+        margin-bottom: 8px;
+      ">
+        Recuperación de contraseña
+      </h2>
+
+      <p style="
+        color: #4a4a4a;
+        text-align: center;
+        font-size: 15px;
+        margin: 0;
+      ">
+        Aquí tienes el código para restablecer tu contraseña.
+      </p>
+
+      <div style="
+        margin: 35px auto;
+        background: #eef2ff;
+        border: 1px solid #d4ddff;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+      ">
+        <span style="
+          font-size: 38px;
+          font-weight: bold;
+          letter-spacing: 6px;
+          color: #3a57e8;
+        ">
+          ${code}
+        </span>
+      </div>
+
+      <p style="
+        color: #555;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 25px;
+      ">
+        El código expira en <strong>10 minutos</strong>.
+      </p>
+
+      <div style="text-align: center;">
+        <a href="https://tutorhub.click"
+          style="
+            display: inline-block;
+            padding: 12px 25px;
+            background: #3a57e8;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 15px;
+          "
+        >
+          Ir al sitio
+        </a>
+      </div>
+
+      <hr style="
+        margin: 30px 0;
+        border: none;
+        border-bottom: 1px solid #eee;
+      " />
+
+      <p style="
+        color: #999;
+        font-size: 12px;
+        text-align: center;
+      ">
+        Si no solicitaste este código, puedes ignorar este mensaje.
+      </p>
+    </div>
+  </div>
+`,
   });
 
   return true;
@@ -55,6 +140,9 @@ const resetPasswordWithCode = async (email, code, newPassword) => {
   if (!newPassword || newPassword.trim() === "")
   throw new Error("La nueva contraseña es obligatoria");
 
+  if (usuario.validateCode === false)
+    throw new Error("El código no ha sido verificado");
+
 
   // Cambiar contraseña
   usuario.password = await bcrypt.hash(String(newPassword), 12);
@@ -62,6 +150,7 @@ const resetPasswordWithCode = async (email, code, newPassword) => {
   // Limpiar código
   usuario.codigo_recuperacion = null;
   usuario.codigo_expira = null;
+  usuario.validateCode = false;
 
   await usuario.save();
 
