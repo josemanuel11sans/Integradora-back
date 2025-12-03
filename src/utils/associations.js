@@ -87,5 +87,31 @@ Materia.belongsToMany(Usuario, {
   as: 'tutores'
 });
 
+// Espacio pertenece a una materia
+Espacio.belongsTo(Materia, {
+  foreignKey: 'materia_id',
+  as: 'materia'
+});
+// Materia tiene muchos espacios
+Materia.hasMany(Espacio, {
+  foreignKey: 'materia_id',
+  as: 'espacios'
+});
+
+
+// Espacio 1 --- N Archivos (Cloudinary)
+Espacio.hasMany(File, {
+  foreignKey: 'espacio_id',
+  sourceKey: 'id_espacio',
+  as: 'archivos'
+});
+
+File.belongsTo(Espacio, {
+  foreignKey: 'espacio_id',
+  targetKey: 'id_espacio',
+  as: 'espacio'
+});
+
+
 
 module.exports = { Usuario, File, Espacio, Asesoria, Carrera, Materia };

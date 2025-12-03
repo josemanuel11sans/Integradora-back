@@ -1,15 +1,24 @@
 const Espacio = require('./espacios.model');
 const Usuario = require('../Usuarios/usuarios.model');
+const Materia = require('../Materias/materias.model');
+const { Op } = require('sequelize');
 
 // Obtener todos los espacios
 const getAll = async () => {
   return await Espacio.findAll({
     where: { estado: true },
-    include: [{
-      model: Usuario,
-      as: 'tutor',
-      attributes: ['id_usuario', 'nombre', 'apellido', 'email']
-    }],
+    include: [
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Materia,
+        as: 'materia',
+        attributes: ['id_materia', 'nombre_materia']
+      }
+    ],
     order: [['createdAt', 'DESC']]
   });
 };
@@ -17,22 +26,52 @@ const getAll = async () => {
 // Obtener espacios por tutor
 const getByTutor = async (tutorId) => {
   return await Espacio.findAll({
-    where: { 
-      tutor_id: tutorId,
-      estado: true 
-    },
+    where: { tutor_id: tutorId, estado: true },
+    include: [
+      { 
+        model: Materia,
+        as: 'materia',
+        attributes: ['id_materia', 'nombre_materia']
+      }
+    ],
     order: [['createdAt', 'DESC']]
+  });
+};
+
+// Obtener espacios por materia
+const getByMateria = async (materiaId) => {
+  return await Espacio.findAll({
+    where: { materia_id: materiaId, estado: true },
+    include: [
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido']
+      },
+      {
+        model: Materia,
+        as: 'materia',
+        attributes: ['id_materia', 'nombre_materia']
+      }
+    ]
   });
 };
 
 // Obtener un espacio por ID
 const getById = async (id) => {
   return await Espacio.findByPk(id, {
-    include: [{
-      model: Usuario,
-      as: 'tutor',
-      attributes: ['id_usuario', 'nombre', 'apellido', 'email']
-    }]
+    include: [
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Materia,
+        as: 'materia',
+        attributes: ['id_materia', 'nombre_materia']
+      }
+    ]
   });
 };
 
@@ -40,56 +79,40 @@ const getById = async (id) => {
 const searchByName = async (searchTerm) => {
   return await Espacio.findAll({
     where: {
-      nombre: {
-        [Op.like]: `%${searchTerm}%`
-      },
+      nombre: { [Op.like]: `%${searchTerm}%` },
       estado: true
     },
-    include: [{
-      model: Usuario,
-      as: 'tutor',
-      attributes: ['id_usuario', 'nombre', 'apellido']
-    }]
+    include: [
+      { model: Usuario, as: 'tutor', attributes: ['id_usuario', 'nombre', 'apellido'] },
+      { model: Materia, as: 'materia', attributes: ['id_materia', 'nombre_materia'] }
+    ]
   });
 };
 
-// Crear un nuevo espacio
+// Crear nuevo espacio
 const createEspacio = async (data) => {
-  // Verificar que el tutor existe y tiene el rol correcto
   const tutor = await Usuario.findByPk(data.tutor_id);
-  if (!tutor) {
-    throw new Error('El tutor especificado no existe');
-  }
-  // Roles válidos según usuarios.model.js: 'student', 'tutor', 'coordinator', 'admin'
-  if (tutor.role !== 'tutor' && tutor.role !== 'admin') {
-    throw new Error('El usuario no tiene el rol de tutor');
-  }
 
-  // Verificar que no existe un espacio con el mismo nombre para ese tutor
+  if (!tutor) throw new Error("El tutor especificado no existe");
+  if (tutor.role !== "tutor" && tutor.role !== "admin")
+    throw new Error("El usuario no tiene el rol de tutor");
+
   const existe = await Espacio.findOne({
-    where: {
-      nombre: data.nombre,
-      tutor_id: data.tutor_id,
-      estado: true
-    }
+    where: { nombre: data.nombre, tutor_id: data.tutor_id, estado: true }
   });
-  
-  if (existe) {
-    throw new Error('Ya existe un espacio con ese nombre para este tutor');
-  }
+
+  if (existe)
+    throw new Error("Ya existe un espacio con ese nombre para este tutor");
 
   return await Espacio.create(data);
 };
 
-// Actualizar un espacio
 const updateEspacio = async (id, data) => {
   const espacio = await Espacio.findByPk(id);
-  
-  if (!espacio) {
-    return null;
-  }
 
-  // Si se está actualizando el nombre, verificar que no exista otro con ese nombre
+  if (!espacio) return null;
+
+  // Validar cambio de nombre (si viene en la petición)
   if (data.nombre && data.nombre !== espacio.nombre) {
     const existe = await Espacio.findOne({
       where: {
@@ -99,55 +122,32 @@ const updateEspacio = async (id, data) => {
         id_espacio: { [Op.ne]: id }
       }
     });
-    
+
     if (existe) {
-      throw new Error('Ya existe un espacio con ese nombre');
+      throw new Error('Ya existe un espacio con este nombre para este tutor');
     }
   }
 
-  return await espacio.update(data);
-};
-
-// Eliminar un espacio (soft delete)
-const deleteEspacio = async (id) => {
-  const espacio = await Espacio.findByPk(id);
-  
-  if (!espacio) {
-    return null;
+  // Validar cambio de materia (si viene en la petición)
+  if (data.materia_id && data.materia_id !== espacio.materia_id) {
+    const materiaExiste = await Materia.findByPk(data.materia_id);
+    if (!materiaExiste) {
+      throw new Error('La materia proporcionada no existe');
+    }
   }
 
-  // TODO: Verificar si tiene reservas o materiales asociados
-  // Según el DFR 3.4, se debe avisar si hay reservas o materiales
-  // const tieneReservas = await verificarReservas(id);
-  // const tieneMateriales = await verificarMateriales(id);
-  
-  // if (tieneReservas || tieneMateriales) {
-  //   throw new Error('El espacio tiene reservas o materiales asociados');
-  // }
+  // Realizar actualización
+  await espacio.update(data);
 
-  // Soft delete: cambiar estado a false
-  return await espacio.update({ estado: false });
-};
-
-// Eliminar permanentemente (hard delete)
-const hardDeleteEspacio = async (id) => {
-  const espacio = await Espacio.findByPk(id);
-  
-  if (!espacio) {
-    return null;
-  }
-
-  await espacio.destroy();
   return espacio;
 };
 
 module.exports = {
   getAll,
   getByTutor,
+  getByMateria,
   getById,
   searchByName,
   createEspacio,
-  updateEspacio,
-  deleteEspacio,
-  hardDeleteEspacio
+  updateEspacio
 };

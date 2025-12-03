@@ -18,7 +18,8 @@ const uploadFile = async (req, res) => {
       mimetype: req.file.mimetype,
       originalName: req.file.originalname,
       // usuarioId: req.user.id, //se guarda el usuario que lo esta guardando
-      usuarioId: usuarioId
+      usuarioId: usuarioId,
+      espacio_id: req.body.espacio_id
     });
 
     res.json({
@@ -71,7 +72,21 @@ const getFileByPublicId = async (req, res) =>{
   }
 }
 
+const getFilesByEspacioId = async (req, res) => {
+  try {
+    const { espacioId } = req.params;
+    const files = await File.findAll({
+      where: {
+        espacio_id: espacioId
+      }
+    });
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener archivos por espacio" });
+  }
+};
+
 
 //optener solo los archivos
 
-module.exports = { uploadFile, getFiles, getFileByPublicId };
+module.exports = { uploadFile, getFiles, getFileByPublicId, getFilesByEspacioId };

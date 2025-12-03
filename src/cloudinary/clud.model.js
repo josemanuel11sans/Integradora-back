@@ -38,7 +38,12 @@ const File = sequelize.define("File", {
       model: "usuarios",
       key:"id_usuario",
     }
+  },
+  espacio_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
+
 },{
   sequelize,
   modelName: "Cloudinary",

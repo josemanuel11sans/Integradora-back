@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("./upload");
-const { uploadFile, getFileByPublicId ,getFiles } = require("./file.controller");
+const { uploadFile, getFileByPublicId ,getFiles, getFilesByEspacioId } = require("./file.controller");
 
 /**
  * @swagger
@@ -73,5 +73,9 @@ router.get("/all", getFiles);
  *         description: Archivo no encontrado.
  */
 router.get("/file/:publicId", getFileByPublicId);
+
+
+//optener los archivos por espacio id
+router.get("/espacio/:espacioId", getFilesByEspacioId);
 
 module.exports = router;

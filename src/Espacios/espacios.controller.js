@@ -72,25 +72,41 @@ const create = async (req, res, next) => {
 // Actualizar un espacio
 const update = async (req, res, next) => {
   try {
-    const espacioActualizado = await espaciosService.updateEspacio(
-      req.params.id, 
-      req.body
-    );
-    
+    const id = req.params.id;
+    const datos = req.body;
+
+    const espacioActualizado = await espaciosService.updateEspacio(id, datos);
+
     if (!espacioActualizado) {
-      return res.status(404).json({ 
-        message: 'Espacio no encontrado' 
+      return res.status(404).json({
+        message: 'Espacio no encontrado'
       });
     }
-    
-    res.json({
+
+    return res.json({
       message: 'Espacio actualizado exitosamente',
       espacio: espacioActualizado
     });
+
   } catch (err) {
+    if (err.message.includes('nombre')) {
+      return res.status(409).json({
+        message: err.message,
+        code: 'NAME_DUPLICATE'
+      });
+    }
+
+    if (err.message.includes('materia')) {
+      return res.status(400).json({
+        message: err.message,
+        code: 'INVALID_MATERIA'
+      });
+    }
+
     next(err);
   }
 };
+
 
 // Eliminar un espacio (soft delete)
 const remove = async (req, res, next) => {
@@ -118,6 +134,16 @@ const remove = async (req, res, next) => {
   }
 };
 
+//Listar por materia
+const listByMateria = async (req, res, next) => {
+  try {
+    const espacios = await espaciosService.getByMateria(req.params.materiaId);
+    res.json(espacios);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   list,
   listByTutor,
@@ -125,5 +151,6 @@ module.exports = {
   search,
   create,
   update,
-  remove
+  remove,
+  listByMateria
 };
