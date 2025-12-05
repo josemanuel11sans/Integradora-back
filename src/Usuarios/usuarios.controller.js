@@ -70,5 +70,22 @@ const getByRole = async (req, res, next) => {
   }
 };
 
+const countByRole = async (req, res, next) => {
+  try {
+    const counts = await usuariosService.countByRole();
+    res.json(counts);
+  } catch (err) { 
+    next(err); 
+  }
+};
+
 // Actualiza la exportación:
-module.exports = { list, getOne, create, update, remove, getByRole };
+module.exports = { 
+  list, 
+  getOne, 
+  create, 
+  update, 
+  remove, 
+  getByRole,
+  countByRole  // ← Agregar esta línea
+};

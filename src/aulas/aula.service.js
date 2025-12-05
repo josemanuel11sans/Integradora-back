@@ -1,5 +1,5 @@
-const Aula = require("../models/Aula");
-const Edificio = require("../models/Edificio");
+const Aula = require("./aula.model");
+const Edificio = require("../Edificios/edificios.model");
 
 const getAll = () => Aula.findAll({ include: Edificio });
 

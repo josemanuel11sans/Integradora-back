@@ -1,4 +1,4 @@
-const servicio = require("./aulas.service");
+const servicio = require("./aula.service");
 
 const list = async (req, res) => {
   res.json(await servicio.getAll());

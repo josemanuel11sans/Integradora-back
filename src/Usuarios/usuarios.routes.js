@@ -174,6 +174,42 @@ router.put('/usuarios/update/:id', usuarioController.update);
 router.delete('/usuarios/delete/:id', usuarioController.remove); 
 // Ruta DELETE para eliminar un usuario por id
 
+/**
+ * @swagger
+ * /api/usuarios/count-by-role:
+ *   get:
+ *     summary: Obtener cantidad de usuarios por rol
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Retorna la cantidad de usuarios agrupados por rol. Solo accesible por admin y coordinador.
+ *     responses:
+ *       200:
+ *         description: Conteo de usuarios por rol
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 student:
+ *                   type: integer
+ *                   example: 1
+ *                 tutor:
+ *                   type: integer
+ *                   example: 1
+ *                 coordinator:
+ *                   type: integer
+ *                   example: 1
+ *                 admin:
+ *                   type: integer
+ *                   example: 1
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No autorizado
+ */
+router.get('/usuarios/count-by-role', authenticate, authorizeRoles('admin', 'coordinator'), usuarioController.countByRole);
+
 module.exports = router; 
 // Exporta el router para usarlo en la app principal
 

@@ -68,5 +68,25 @@ const getByRole = async (role) => {
   });
 };
 
+const countByRole = async () => {
+  const roles = ['student', 'tutor', 'coordinator', 'admin'];
+  const counts = {};
+  
+  for (const role of roles) {
+    const count = await Usuario.count({ where: { role } });
+    counts[role] = count;
+  }
+  
+  return counts;
+};
+
 // Actualiza la exportación:
-module.exports = { getAll, getById, createUsuario, updateUsuario, deleteUsuario, getByRole };
+module.exports = { 
+  getAll, 
+  getById, 
+  createUsuario, 
+  updateUsuario, 
+  deleteUsuario, 
+  getByRole,
+  countByRole  // ← Agregar esta línea
+};
