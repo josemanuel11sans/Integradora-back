@@ -10,6 +10,18 @@ const list = async (req, res, next) => {
     } catch (err) { next(err); }
 }
 
+const listActive = async (req, res, next) => {
+    try {
+        const materias = await materiasService.getActive();
+        if (materias.length === 0) {
+            return res.status(404).json({ message: 'No hay materias disponibles' });
+        }
+        res.json(materias);
+    } catch (err) { 
+        next(err); 
+    }
+}
+
 const getOne = async (req, res, next) => {
     try {
         const materia = await materiasService.getById(req.params.id);
@@ -56,4 +68,4 @@ const getByCarrera = async (req, res, next) => {
   } catch (err) {next(err);}
 };
 
-module.exports = { list, getOne, create, update, remove, getByCarrera };
+module.exports = { list, listActive ,getOne, create, update, remove, getByCarrera };

@@ -6,26 +6,20 @@ const materiasController = require('./materias.controller');
 const authenticate = require('../auth/middlewares/authenticate');
 const authorizeRoles = require('../auth/middlewares/authorizeRoles');
 
-// RUTAS ESPECÍFICAS PRIMERO (antes de las rutas con parámetros)
-
-// Crear una materia
+// 1. Rutas con paths literales (no parámetros)
+router.get('/active', materiasController.listActive);
+router.get('/all', materiasController.list);
 router.post('/create', materiasController.create);
 
-// Obtener materias por carrera id (ESPECÍFICA - debe ir antes de /:id)
+// 2. Rutas con múltiples segmentos específicos
 router.get('/carrera/:carreraId', materiasController.getByCarrera);
 
-// Obtener todas las materias
-router.get('/all', materiasController.list);
+// 3. Rutas con paths específicos + parámetros
+router.put('/update/:id', materiasController.update);  // ✅ ANTES de /:id
+router.delete('/delete/:id', materiasController.remove);  // ✅ ANTES de /:id
 
-// RUTAS CON PARÁMETROS DINÁMICOS AL FINAL
 
-// Obtener una materia por id
-router.get('/:id', materiasController.getOne);
-
-// Actualizar una materia por id
-router.put('/update/:id', materiasController.update);
-
-// Eliminar una materia por id
-router.delete('/delete/:id', materiasController.remove);
+// 4. Ruta genérica con solo parámetro (debe ir AL FINAL)
+router.get('/:id', materiasController.getOne);  // ✅ AL FINAL
 
 module.exports = router;

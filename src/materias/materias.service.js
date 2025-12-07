@@ -4,6 +4,19 @@ const Carrera = require('../Carreras/carreras.model');
 const getAll = async () => {
   return await Materia.findAll({
     order: [['nombre_materia', 'ASC']],
+    include:[
+        {
+            model: Carrera,
+            as: 'carrera',
+            attributes: ['id_carrera', 'nombre_carrera']
+        },
+    ]
+  });
+}
+
+const getActive = async () => {
+  return await Materia.findAll({
+    order: [['nombre_materia', 'ASC']],
     where: { activo: true },
     include:[
         {
@@ -61,4 +74,4 @@ const getMateriasByCarreraId = async (carreraId) => {
   });
 }
 
-module.exports = { getAll, getById, createMateria, updateMateria, deleteMateria, getMateriasByCarreraId };
+module.exports = { getAll, getActive, getById, createMateria, updateMateria, deleteMateria, getMateriasByCarreraId };
