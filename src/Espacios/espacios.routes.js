@@ -27,7 +27,7 @@ const authorizeRoles = require('../auth/middlewares/authorizeRoles');
  *       401:
  *         description: No autenticado
  */
-router.get('/espacios/all', authenticate, espaciosController.list);
+router.get('/all', authenticate, espaciosController.list);
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ router.get('/espacios/all', authenticate, espaciosController.list);
  *         description: No autenticado
  */
 router.get(
-  '/espacios/tutor/:tutorId',
+  '/tutor/:tutorId',
   authenticate,
   authorizeRoles('tutor', 'coordinador', 'admin'),
   espaciosController.listByTutor
@@ -80,7 +80,7 @@ router.get(
  *       401:
  *         description: No autenticado
  */
-router.get('/espacios/search', authenticate, espaciosController.search);
+router.get('/search', authenticate, espaciosController.search);
 
 /**
  * @swagger
@@ -105,7 +105,7 @@ router.get('/espacios/search', authenticate, espaciosController.search);
  *       401:
  *         description: No autenticado
  */
-router.get('/espacios/id/:id', authenticate, espaciosController.getOne);
+router.get('/id/:id', authenticate, espaciosController.getOne);
 
 /**
  * @swagger
@@ -148,7 +148,7 @@ router.get('/espacios/id/:id', authenticate, espaciosController.getOne);
  *         description: No autorizado
  */
 router.post(
-  '/espacios/create',
+  '/create',
   authenticate,
   authorizeRoles('tutor', 'admin', 'coordinator'),
   espaciosController.create
@@ -193,7 +193,7 @@ router.post(
  *         description: No autorizado
  */
 router.put(
-  '/espacios/update/:id',
+  '/update/:id',
   authenticate,
   authorizeRoles('tutor', 'admin'),
   espaciosController.update
@@ -227,7 +227,7 @@ router.put(
  *         description: No autorizado
  */
 router.delete(
-  '/espacios/delete/:id',
+  '/delete/:id',
   authenticate,
   authorizeRoles('tutor', 'admin'),
   espaciosController.remove

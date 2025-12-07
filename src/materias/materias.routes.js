@@ -1,30 +1,31 @@
 const express = require('express'); 
-// Importa Express
 const router = express.Router(); 
-// Crea un router de Express
 
 const materiasController = require('./materias.controller'); 
-// Importa el controlador de materias
 
 const authenticate = require('../auth/middlewares/authenticate');
 const authorizeRoles = require('../auth/middlewares/authorizeRoles');
 
-//crear una materia
+// RUTAS ESPECÍFICAS PRIMERO (antes de las rutas con parámetros)
+
+// Crear una materia
 router.post('/create', materiasController.create);
 
-//obtener todas las materias
-router.get('/', materiasController.list);
+// Obtener materias por carrera id (ESPECÍFICA - debe ir antes de /:id)
+router.get('/carrera/:carreraId', materiasController.getByCarrera);
 
-//obtener una materia por id
+// Obtener todas las materias
+router.get('/all', materiasController.list);
+
+// RUTAS CON PARÁMETROS DINÁMICOS AL FINAL
+
+// Obtener una materia por id
 router.get('/:id', materiasController.getOne);
 
-//actualizar una materia por id
-router.put('/:id', materiasController.update);
+// Actualizar una materia por id
+router.put('/update/:id', materiasController.update);
 
-//eliminar una materia por id
-router.delete('/:id', materiasController.remove);
-
-//obtener materias por carrera id
-router.get('/carrera/:carreraId', materiasController.getByCarrera);
+// Eliminar una materia por id
+router.delete('/delete/:id', materiasController.remove);
 
 module.exports = router;

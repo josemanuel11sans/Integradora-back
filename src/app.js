@@ -16,7 +16,7 @@ const fileRoutes = require("./cloudinary/file.routes");
 const asesoriasRoutes = require("./Asesorias/asesorias.routes");
 const carrerasRoutes = require("./Carreras/carreras.routes");
 const materiasRoutes = require("./materias/materias.routes");
-const espaciosRoutes = require("./Espacios/espacios.routes");
+const espaciosRoutes = require("./espacios/espacios.routes");
 const edificiosRoutes = require("./edificios/edificios.routes");
 // importa las rutas de tutores
 app.use(express.json());
