@@ -70,8 +70,28 @@ const getFileByPublicId = async (req, res) =>{
     });
   }
 }
+// Obtener archivos por usuarioId
+const getFilesByUsuarioId = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+
+    const files = await File.findAll({
+      where: { usuarioId }
+    });
+
+    if (files.length === 0) {
+      return res.status(404).json({ error: "No se encontraron archivos para este usuario" });
+    }
+
+    res.json(files);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener archivos por usuario" });
+  }
+};
 
 
 //optener solo los archivos
 
-module.exports = { uploadFile, getFiles, getFileByPublicId };
+  module.exports = { uploadFile, getFiles, getFileByPublicId,getFilesByUsuarioId };

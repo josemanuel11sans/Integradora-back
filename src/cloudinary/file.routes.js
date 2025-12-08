@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("./upload");
-const { uploadFile, getFileByPublicId ,getFiles } = require("./file.controller");
+const { uploadFile, getFileByPublicId ,getFiles,getFilesByUsuarioId } = require("./file.controller");
 
 /**
  * @swagger
@@ -73,5 +73,22 @@ router.get("/all", getFiles);
  *         description: Archivo no encontrado.
  */
 router.get("/file/:publicId", getFileByPublicId);
+
+/**
+ * @swagger
+ * /api/files/user/{usuarioId}:
+ *   get:
+ *     summary: Obtener archivos por ID de usuario
+ *     tags: [Cloudinary]
+ *     parameters:
+ *       - in: path
+ *         name: usuarioId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del usuario dueño de los archivos.
+ */
+router.get("/user/:usuarioId", getFilesByUsuarioId);
+
 
 module.exports = router;

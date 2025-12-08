@@ -61,7 +61,8 @@ const createEspacio = async (data) => {
     throw new Error('El tutor especificado no existe');
   }
   // Roles válidos según usuarios.model.js: 'student', 'tutor', 'coordinator', 'admin'
-  if (tutor.role !== 'tutor' && tutor.role !== 'admin') {
+  console.log('Rol del tutor:', tutor.role);
+  if (tutor.role !== 'tutor' && tutor.role !== 'coordinator' && tutor.role !== 'student') {
     throw new Error('El usuario no tiene el rol de tutor');
   }
 
@@ -140,6 +141,22 @@ const hardDeleteEspacio = async (id) => {
   await espacio.destroy();
   return espacio;
 };
+//all segun el id del tutor
+const getByTutor2 = async (tutorId) => {
+  return await Espacio.findAll({
+    where: { 
+      tutor_id: tutorId,
+      estado: true
+    },
+    include: [{
+      model: Usuario,
+      as: 'tutor',
+      attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+    }],
+    order: [['createdAt', 'DESC']]
+  });
+};
+
 
 module.exports = {
   getAll,
