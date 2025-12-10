@@ -195,7 +195,7 @@ router.post(
 router.put(
   '/update/:id',
   authenticate,
-  authorizeRoles('tutor', 'admin'),
+  authorizeRoles('tutor', 'coordinator', 'admin'),
   espaciosController.update
 );
 
@@ -229,7 +229,7 @@ router.put(
 router.delete(
   '/delete/:id',
   authenticate,
-  authorizeRoles('tutor', 'admin'),
+  authorizeRoles('tutor', 'coordinator', 'admin'),
   espaciosController.remove
 );
 
@@ -237,7 +237,7 @@ router.delete(
 router.delete(
   '/hard-delete/:id',
   authenticate,
-  authorizeRoles('admin'),
+  authorizeRoles('tutor', 'coordinator', 'admin'),
   espaciosController.hardRemove
 );
 

@@ -2,7 +2,7 @@ const { DataTypes, Model } = require("sequelize");
 const {sequelize} = require("../config/db");
 
 class Edificio extends Model {}
-
+// modelo de base de datos usando sequialice como orm 
 Edificio.init(
   {
     nombre: {

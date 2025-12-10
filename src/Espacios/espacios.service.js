@@ -1,5 +1,6 @@
 const Espacio = require('./espacios.model');
 const Usuario = require('../Usuarios/usuarios.model');
+const { Op } = require('sequelize');
 
 // Obtener todos los espacios
 const getAll = async () => {

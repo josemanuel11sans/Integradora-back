@@ -57,9 +57,11 @@ const search = async (req, res, next) => {
 
 // Crear un nuevo espacio
 const create = async (req, res, next) => {
+  console.log(req.body);
   try {
     const nuevoEspacio = await espaciosService.createEspacio(req.body);
-    
+    console.log(nuevoEspacio);
+    console.log(req.body)
     res.status(201).json({
       message: 'Espacio registrado exitosamente',
       espacio: nuevoEspacio
