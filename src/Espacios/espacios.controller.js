@@ -118,6 +118,19 @@ const remove = async (req, res, next) => {
   }
 };
 
+// Eliminación permanente (solo admin)
+const hardRemove = async (req, res, next) => {
+  try {
+    const espacio = await espaciosService.hardDeleteEspacio(req.params.id);
+    if (!espacio) {
+      return res.status(404).json({ message: 'Espacio no encontrado' });
+    }
+    res.json({ message: 'Espacio eliminado permanentemente' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   list,
   listByTutor,
@@ -125,5 +138,6 @@ module.exports = {
   search,
   create,
   update,
-  remove
+  remove,
+  hardRemove
 };

@@ -1,6 +1,7 @@
 const edificiosService = require('./edificios.service');
 const Edificio = require("../edificios/edificios.model");
-
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 // Obtener todos los edificios
 const list = async (req, res, next) => {
   try {
@@ -55,7 +56,7 @@ const create = async (req, res, next) => {
       });
     }
 
-    if (!ubicacion || ubicacion.trim().length < 5) {
+    if (!ubicacion || ubicacion.trim().length < 2) {
       return res.status(400).json({
         message: "La dirección es obligatoria y debe tener al menos 5 caracteres",
         field: "direccion"
@@ -153,9 +154,9 @@ const update = async (req, res, next) => {
     }
 
     if (ubicacion !== undefined) {
-      if (!ubicacion.trim() || ubicacion.trim().length < 5) {
+      if (!ubicacion.trim() || ubicacion.trim().length < 1) {
         return res.status(400).json({
-          message: "La dirección debe tener al menos 5 caracteres",
+          message: "La dirección debe tener al menos 2 caracteres",
           field: "ubicacion"
         });
       }
@@ -216,7 +217,7 @@ const remove = async (req, res, next) => {
     }
 
     // Verificar si el edificio tiene aulas asociadas antes de eliminar
-    const Aula = require('../models/Aula'); // Importar modelo Aula
+    const Aula = require('../aulas/aula.model'); // Importar modelo Aula
     const aulasAsociadas = await Aula.count({
       where: { edificioId: id }
     });
@@ -290,7 +291,7 @@ const getAulasByEdificio = async (req, res, next) => {
       });
     }
 
-    const Aula = require('../models/Aula');
+    const Aula = require('../aulas/aula.model');
     const aulas = await Aula.findAll({
       where: { edificioId: id },
       include: [{

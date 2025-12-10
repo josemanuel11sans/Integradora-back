@@ -38,6 +38,14 @@ const File = sequelize.define("File", {
       model: "usuarios",
       key:"id_usuario",
     }
+  },
+  espacioId: { //Relacion con el modelo de Espacios para saber a que espacio pertenece cada archivo
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references:{
+      model: "espacios",
+      key:"id_espacio",
+    }
   }
 },{
   sequelize,
@@ -46,5 +54,10 @@ const File = sequelize.define("File", {
   timestamps: true //genera createAt y updateAt automaticamnte 
   }
 );
+
+// Método helper: obtener archivos por espacioId
+File.getByEspacioId = function(espacioId) {
+  return File.findAll({ where: { espacioId } });
+};
 
 module.exports = File;

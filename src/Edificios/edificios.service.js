@@ -34,7 +34,7 @@ const remove = async (id) => {
 
 // Obtener edificios activos con sus aulas
 const getAllWithAulas = () => {
-  const Aula = require('../models/Aula');
+  const Aula = require('../aulas/aula.model');
   return Edificio.findAll({
     where: { estado: true },
     include: [{

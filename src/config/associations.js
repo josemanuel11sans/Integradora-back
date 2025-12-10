@@ -3,6 +3,8 @@ const Carrera = require("../Carreras/carreras.model");
 const Reserva = require("../reservas/reserva.model");
 const Edificio = require("../Edificios/edificios.model");
 const Aula = require("../aulas/aula.model");
+const Cloudinary = require("../cloudinary/clud.model");
+const Espacio = require("../Espacios/espacios.model");
 // Relaciones
 
 // Usuario -> Carrera
@@ -20,6 +22,10 @@ Reserva.belongsTo(Usuario, {foreignKey: "usuario_id",as: "usuario",});
 Edificio.hasMany(Aula, { foreignKey: "edificioId" });
 Aula.belongsTo(Edificio, { foreignKey: "edificioId" });
 
+// Un Espacio tiene muchos Cloudinary (archivos)
+Espacio.hasMany(Cloudinary, { foreignKey: "espacioId", as: "archivos" });
+Cloudinary.belongsTo(Espacio, { foreignKey: "espacioId", as: "espacio" });
+
 
 module.exports = {
   Usuario,
@@ -27,4 +33,6 @@ module.exports = {
   Reserva,
   Edificio,
   Aula,
+  Cloudinary,
+  Espacio,
 };

@@ -27,7 +27,7 @@ router.put('/:id',
 // Eliminar edificio (eliminación física)
 router.delete('/:id', 
   authenticate, 
-  authorizeRoles('admin'),
+  authorizeRoles('admin', "coordinator"),
   edificiosController.remove
 );
 

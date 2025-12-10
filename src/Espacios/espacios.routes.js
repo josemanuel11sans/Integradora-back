@@ -233,5 +233,13 @@ router.delete(
   espaciosController.remove
 );
 
+// Eliminación permanente (hard delete) — solo administradores
+router.delete(
+  '/hard-delete/:id',
+  authenticate,
+  authorizeRoles('admin'),
+  espaciosController.hardRemove
+);
+
 
 module.exports = router;

@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("./upload");
-const { uploadFile, getFileByPublicId ,getFiles,getFilesByUsuarioId } = require("./file.controller");
+const { uploadFile, getFileByPublicId ,getFiles,getFilesByUsuarioId, getFilesByEspacioId, deleteFileById } = require("./file.controller");
 
 /**
  * @swagger
@@ -89,6 +89,11 @@ router.get("/file/:publicId", getFileByPublicId);
  *         description: ID del usuario dueño de los archivos.
  */
 router.get("/user/:usuarioId", getFilesByUsuarioId);
+
+router.get("/espacio/:espacioId", getFilesByEspacioId);
+
+// Eliminar archivo por id (borra también en Cloudinary)
+router.delete('/:id', deleteFileById);
 
 
 module.exports = router;
