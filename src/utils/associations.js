@@ -1,6 +1,6 @@
 const Usuario = require("../Usuarios/usuarios.model");
 const File = require("../cloudinary/clud.model");
-const Espacio = require("../Espacios/espacios.model");
+const Espacio = require("../espacios/espacios.model");
 const Asesoria = require('../Asesorias/asesorias.model');
 const Carrera = require('../Carreras/carreras.model');
 const Materia = require('../materias/materias.model');
