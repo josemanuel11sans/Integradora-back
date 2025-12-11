@@ -41,15 +41,18 @@ const createEstudiante = async (data) => {
 };
 
 
+// usuarios.service.js
 const updateUsuario = async (id, data) => {
-  const usuario = await Usuario.findByPk(id); 
-  // Busca el usuario a actualizar
-  if (!usuario) return null; 
-  // Si no existe, devuelve null
-  return await usuario.update(data); 
-  // Actualiza el usuario con los datos proporcionados
-};
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) return null;
 
+  // Si viene password, encríptala antes de guardar
+  if (data.password) {
+    data.password = await bcrypt.hash(data.password, SALT_ROUNDS);
+  }
+
+  return await usuario.update(data);
+};
 const deleteUsuario = async (id) => {
   const usuario = await Usuario.findByPk(id); 
   // Busca el usuario a eliminar
