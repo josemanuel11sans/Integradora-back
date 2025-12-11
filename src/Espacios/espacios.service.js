@@ -31,6 +31,7 @@ const getByTutor = async (tutorId, estadoFilter = true) => {
             SELECT COUNT(*)
             FROM cloudinary
             WHERE cloudinary.espacioId = Espacio.id_espacio
+              AND (cloudinary.status = 1 OR cloudinary.status = TRUE)
           )`),
           'materialesCount'
         ]
