@@ -3,9 +3,10 @@ const Usuario = require('../Usuarios/usuarios.model');
 const { Op } = require('sequelize');
 
 // Obtener todos los espacios
+// En espacios.service.js
 const getAll = async () => {
   return await Espacio.findAll({
-    where: { estado: true },
+    // Remover el filtro de estado para obtener todos
     include: [{
       model: Usuario,
       as: 'tutor',
@@ -126,24 +127,16 @@ const updateEspacio = async (id, data) => {
 };
 
 // Eliminar un espacio (soft delete)
+// Eliminar un espacio (soft delete)
 const deleteEspacio = async (id) => {
   const espacio = await Espacio.findByPk(id);
-  
+
   if (!espacio) {
     return null;
   }
 
-  // TODO: Verificar si tiene reservas o materiales asociados
-  // Según el DFR 3.4, se debe avisar si hay reservas o materiales
-  // const tieneReservas = await verificarReservas(id);
-  // const tieneMateriales = await verificarMateriales(id);
-  
-  // if (tieneReservas || tieneMateriales) {
-  //   throw new Error('El espacio tiene reservas o materiales asociados');
-  // }
-
-  // Soft delete: cambiar estado a false
-  return await espacio.update({ estado: false });
+  // Toggle estado: cambiar entre true y false
+  return await espacio.update({ estado: !espacio.estado });
 };
 
 // Eliminar permanentemente (hard delete)

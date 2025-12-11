@@ -46,7 +46,7 @@ const getOne = async (req, res, next) => {
 // Crear nuevo edificio
 const create = async (req, res, next) => {
   try {
-    const { nombre, ubicacion, estado = true } = req.body;
+    const { nombre, ubicacion, descripcion, estado = true } = req.body;
 
     // Validaciones
     if (!nombre || nombre.trim().length < 2) {
@@ -58,21 +58,21 @@ const create = async (req, res, next) => {
 
     if (!ubicacion || ubicacion.trim().length < 2) {
       return res.status(400).json({
-        message: "La dirección es obligatoria y debe tener al menos 5 caracteres",
+        message: "La dirección es obligatoria y debe tener al menos 2 caracteres",
         field: "direccion"
       });
     }
 
     // Verificar si ya existe un edificio con el mismo nombre
     const existente = await Edificio.findOne({
-      where: { 
+      where: {
         nombre: nombre.trim(),
-        estado: true 
+        estado: true
       }
     });
 
     if (existente) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         message: "Ya existe un edificio activo con ese nombre",
         existingId: existente.id
       });
@@ -82,6 +82,7 @@ const create = async (req, res, next) => {
     const nuevoEdificio = await Edificio.create({
       nombre: nombre.trim(),
       ubicacion: ubicacion.trim(),
+      descripcion: descripcion?.trim() || null,
       estado: true
     });
 
@@ -89,7 +90,7 @@ const create = async (req, res, next) => {
       message: "Edificio creado exitosamente",
       data: nuevoEdificio
     });
-    
+
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
@@ -109,18 +110,18 @@ const update = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'ID inválido',
         error: 'El ID debe ser un número válido'
       });
     }
 
-    const { nombre, ubicacion, estado } = req.body;
+    const { nombre, ubicacion, descripcion, estado } = req.body;
 
     // Verificar que el edificio exista
     const edificioExistente = await edificiosService.getById(id);
     if (!edificioExistente) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: 'Edificio no encontrado',
         id: id
       });
@@ -128,7 +129,7 @@ const update = async (req, res, next) => {
 
     // Preparar datos para actualizar
     const datosActualizar = {};
-    
+
     if (nombre !== undefined) {
       if (!nombre.trim() || nombre.trim().length < 2) {
         return res.status(400).json({
@@ -137,17 +138,17 @@ const update = async (req, res, next) => {
         });
       }
       datosActualizar.nombre = nombre.trim();
-      
+
       // Verificar si el nuevo nombre ya existe (excluyendo el actual)
       const nombreExistente = await Edificio.findOne({
-        where: { 
+        where: {
           nombre: nombre.trim(),
-          id: { [Op.ne]: id } // Excluir el edificio actual
+          id: { [Op.ne]: id }
         }
       });
-      
+
       if (nombreExistente) {
-        return res.status(409).json({ 
+        return res.status(409).json({
           message: "Ya existe otro edificio con ese nombre"
         });
       }
@@ -163,6 +164,10 @@ const update = async (req, res, next) => {
       datosActualizar.ubicacion = ubicacion.trim();
     }
 
+    if (descripcion !== undefined) {
+      datosActualizar.descripcion = descripcion?.trim() || null;
+    }
+
     if (estado !== undefined) {
       datosActualizar.estado = true;
     }
@@ -176,13 +181,13 @@ const update = async (req, res, next) => {
 
     // Actualizar el edificio
     const edificioActualizado = await edificiosService.update(id, datosActualizar);
-    
+
     res.json({
       message: "Edificio actualizado exitosamente",
       data: edificioActualizado
     });
 
-  } catch (err) { 
+  } catch (err) {
     if (err.name === 'SequelizeValidationError') {
       return res.status(400).json({
         message: "Error de validación",
@@ -192,7 +197,7 @@ const update = async (req, res, next) => {
         }))
       });
     }
-    next(err); 
+    next(err);
   }
 };
 

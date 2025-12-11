@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 const getAll = () => {
   return Edificio.findAll({
-    where: { estado: true },
+    // Remover filtro de estado para obtener todos
     order: [['nombre', 'ASC']]
   });
 };
@@ -12,16 +12,162 @@ const getById = (id) => {
   return Edificio.findByPk(id);
 };
 
-const create = (data) => {
-  return Edificio.create(data);
+const create = async (req, res, next) => {
+  try {
+    const { nombre, ubicacion, descripcion, estado = true } = req.body; // ← Agregar descripcion
+
+    // Validaciones
+    if (!nombre || nombre.trim().length < 2) {
+      return res.status(400).json({
+        message: "El nombre del edificio es obligatorio y debe tener al menos 2 caracteres",
+        field: "nombre"
+      });
+    }
+
+    if (!ubicacion || ubicacion.trim().length < 2) {
+      return res.status(400).json({
+        message: "La dirección es obligatoria y debe tener al menos 5 caracteres",
+        field: "direccion"
+      });
+    }
+
+    // Verificar si ya existe un edificio con el mismo nombre
+    const existente = await Edificio.findOne({
+      where: {
+        nombre: nombre.trim(),
+        estado: true
+      }
+    });
+
+    if (existente) {
+      return res.status(409).json({
+        message: "Ya existe un edificio activo con ese nombre",
+        existingId: existente.id
+      });
+    }
+
+    // Crear el edificio
+    const nuevoEdificio = await Edificio.create({
+      nombre: nombre.trim(),
+      ubicacion: ubicacion.trim(),
+      descripcion: descripcion?.trim() || null, // ← Agregar descripcion
+      estado: true
+    });
+
+    res.status(201).json({
+      message: "Edificio creado exitosamente",
+      data: nuevoEdificio
+    });
+
+  } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: "Error de validación",
+        errors: error.errors.map(err => ({
+          field: err.path,
+          message: err.message
+        }))
+      });
+    }
+    next(error);
+  }
 };
 
-const update = async (id, data) => {
-  const edificio = await getById(id);
-  if (!edificio) {
-    throw new Error("Edificio no encontrado");
+
+const update = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        message: 'ID inválido',
+        error: 'El ID debe ser un número válido'
+      });
+    }
+
+    const { nombre, ubicacion, descripcion, estado } = req.body; // ← Agregar descripcion
+
+    // Verificar que el edificio exista
+    const edificioExistente = await edificiosService.getById(id);
+    if (!edificioExistente) {
+      return res.status(404).json({
+        message: 'Edificio no encontrado',
+        id: id
+      });
+    }
+
+    // Preparar datos para actualizar
+    const datosActualizar = {};
+
+    if (nombre !== undefined) {
+      if (!nombre.trim() || nombre.trim().length < 2) {
+        return res.status(400).json({
+          message: "El nombre debe tener al menos 2 caracteres",
+          field: "nombre"
+        });
+      }
+      datosActualizar.nombre = nombre.trim();
+
+      // Verificar si el nuevo nombre ya existe (excluyendo el actual)
+      const nombreExistente = await Edificio.findOne({
+        where: {
+          nombre: nombre.trim(),
+          id: { [Op.ne]: id }
+        }
+      });
+
+      if (nombreExistente) {
+        return res.status(409).json({
+          message: "Ya existe otro edificio con ese nombre"
+        });
+      }
+    }
+
+    if (ubicacion !== undefined) {
+      if (!ubicacion.trim() || ubicacion.trim().length < 1) {
+        return res.status(400).json({
+          message: "La dirección debe tener al menos 2 caracteres",
+          field: "ubicacion"
+        });
+      }
+      datosActualizar.ubicacion = ubicacion.trim();
+    }
+
+    // ← Agregar manejo de descripcion
+    if (descripcion !== undefined) {
+      datosActualizar.descripcion = descripcion?.trim() || null;
+    }
+
+    if (estado !== undefined) {
+      datosActualizar.estado = true;
+    }
+
+    // Si no hay datos para actualizar
+    if (Object.keys(datosActualizar).length === 0) {
+      return res.status(400).json({
+        message: "No se proporcionaron datos para actualizar"
+      });
+    }
+
+    // Actualizar el edificio
+    const edificioActualizado = await edificiosService.update(id, datosActualizar);
+
+    res.json({
+      message: "Edificio actualizado exitosamente",
+      data: edificioActualizado
+    });
+
+  } catch (err) {
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: "Error de validación",
+        errors: err.errors.map(error => ({
+          field: error.path,
+          message: error.message
+        }))
+      });
+    }
+    next(err);
   }
-  return edificio.update(data);
 };
 
 const remove = async (id) => {
@@ -29,7 +175,8 @@ const remove = async (id) => {
   if (!edificio) {
     throw new Error("Edificio no encontrado");
   }
-  return edificio.destroy();
+  // Toggle estado: cambiar entre true y false
+  return edificio.update({ estado: !edificio.estado });
 };
 
 // Obtener edificios activos con sus aulas
