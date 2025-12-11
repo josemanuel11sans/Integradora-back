@@ -4,6 +4,7 @@ const Espacio = require("../espacios/espacios.model");
 const Asesoria = require('../Asesorias/asesorias.model');
 const Carrera = require('../Carreras/carreras.model');
 const Materia = require('../materias/materias.model');
+const AlumnoEspacio = require('../AlumnoEspacio/alumnoEspacio.model')
 
 
 // Relación Usuario - File
@@ -70,6 +71,22 @@ Carrera.hasMany(Materia, {
 Materia.belongsTo(Carrera, {
   foreignKey: 'carrera_id',
   as: 'carrera'
+});
+
+
+// MANY TO MANY — Alumnos ↔ Espacios
+Usuario.belongsToMany(Espacio, {
+  through: AlumnoEspacio,
+  as: "espacios_inscritos",    // alumno.espacios_inscritos
+  foreignKey: "alumno_id",
+  otherKey: "espacio_id",
+});
+
+Espacio.belongsToMany(Usuario, {
+  through: AlumnoEspacio,
+  as: "alumnos",               // espacio.alumnos
+  foreignKey: "espacio_id",
+  otherKey: "alumno_id",
 });
 
 module.exports = { Usuario, File, Espacio, Asesoria, Carrera, Materia };

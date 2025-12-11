@@ -159,6 +159,21 @@ const getByTutor2 = async (tutorId) => {
 };
 
 
+// const getByAlumno = async (alumnoId) =>{
+//   return await Espacio.findAll({
+//     where: { 
+//       alumno_id: tutorId,
+//       estado: true
+//     },
+//     include: [{
+//       model: Usuario,
+//       as: 'student',
+//       attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+//     }],
+//     order: [['createdAt', 'DESC']]
+//   });
+// }
+
 module.exports = {
   getAll,
   getByTutor,
