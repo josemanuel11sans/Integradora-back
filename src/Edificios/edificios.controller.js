@@ -2,60 +2,49 @@ const edificiosService = require('./edificios.service');
 const Edificio = require("../edificios/edificios.model");
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-// Obtener todos los edificios
+
+// List
 const list = async (req, res, next) => {
   try {
     const edificios = await edificiosService.getAll();
-    if (!edificios || edificios.length === 0) {
-      return res.status(404).json({ 
-        message: 'No hay edificios disponibles',
-        data: []
-      });
-    }
-    res.json(edificios);
-  } catch (err) { 
-    next(err); 
+    // Opcional: devolver 200 con [] en lugar de 404
+    return res.json(edificios);
+  } catch (err) {
+    next(err);
   }
 };
 
-// Obtener un edificio por ID
+// Get one
 const getOne = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'ID inválido',
         error: 'El ID debe ser un número válido'
       });
     }
-
     const edificio = await edificiosService.getById(id);
     if (!edificio) {
-      return res.status(404).json({ 
-        message: 'Edificio no encontrado',
-        id: id
-      });
+      return res.status(404).json({ message: 'Edificio no encontrado', id });
     }
-
     res.json(edificio);
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
-// Crear nuevo edificio
+// Create
 const create = async (req, res, next) => {
   try {
     const { nombre, ubicacion, descripcion, estado = true } = req.body;
 
-    // Validaciones
     if (!nombre || nombre.trim().length < 2) {
       return res.status(400).json({
         message: "El nombre del edificio es obligatorio y debe tener al menos 2 caracteres",
         field: "nombre"
       });
     }
-
     if (!ubicacion || ubicacion.trim().length < 2) {
       return res.status(400).json({
         message: "La dirección es obligatoria y debe tener al menos 2 caracteres",
@@ -63,14 +52,9 @@ const create = async (req, res, next) => {
       });
     }
 
-    // Verificar si ya existe un edificio con el mismo nombre
     const existente = await Edificio.findOne({
-      where: {
-        nombre: nombre.trim(),
-        estado: true
-      }
+      where: { nombre: nombre.trim(), estado: true }
     });
-
     if (existente) {
       return res.status(409).json({
         message: "Ya existe un edificio activo con ese nombre",
@@ -78,12 +62,11 @@ const create = async (req, res, next) => {
       });
     }
 
-    // Crear el edificio
-    const nuevoEdificio = await Edificio.create({
-      nombre: nombre.trim(),
-      ubicacion: ubicacion.trim(),
-      descripcion: descripcion?.trim() || null,
-      estado: true
+    const nuevoEdificio = await edificiosService.create({
+      nombre,
+      ubicacion,
+      descripcion,
+      estado
     });
 
     res.status(201).json({
@@ -105,7 +88,7 @@ const create = async (req, res, next) => {
   }
 };
 
-// Actualizar edificio por ID
+// Update
 const update = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -115,21 +98,14 @@ const update = async (req, res, next) => {
         error: 'El ID debe ser un número válido'
       });
     }
-
     const { nombre, ubicacion, descripcion, estado } = req.body;
 
-    // Verificar que el edificio exista
     const edificioExistente = await edificiosService.getById(id);
     if (!edificioExistente) {
-      return res.status(404).json({
-        message: 'Edificio no encontrado',
-        id: id
-      });
+      return res.status(404).json({ message: 'Edificio no encontrado', id });
     }
 
-    // Preparar datos para actualizar
     const datosActualizar = {};
-
     if (nombre !== undefined) {
       if (!nombre.trim() || nombre.trim().length < 2) {
         return res.status(400).json({
@@ -137,25 +113,16 @@ const update = async (req, res, next) => {
           field: "nombre"
         });
       }
-      datosActualizar.nombre = nombre.trim();
-
-      // Verificar si el nuevo nombre ya existe (excluyendo el actual)
       const nombreExistente = await Edificio.findOne({
-        where: {
-          nombre: nombre.trim(),
-          id: { [Op.ne]: id }
-        }
+        where: { nombre: nombre.trim(), id: { [Op.ne]: id } }
       });
-
       if (nombreExistente) {
-        return res.status(409).json({
-          message: "Ya existe otro edificio con ese nombre"
-        });
+        return res.status(409).json({ message: "Ya existe otro edificio con ese nombre" });
       }
+      datosActualizar.nombre = nombre.trim();
     }
-
     if (ubicacion !== undefined) {
-      if (!ubicacion.trim() || ubicacion.trim().length < 1) {
+      if (!ubicacion.trim() || ubicacion.trim().length < 2) {
         return res.status(400).json({
           message: "La dirección debe tener al menos 2 caracteres",
           field: "ubicacion"
@@ -163,30 +130,19 @@ const update = async (req, res, next) => {
       }
       datosActualizar.ubicacion = ubicacion.trim();
     }
-
     if (descripcion !== undefined) {
       datosActualizar.descripcion = descripcion?.trim() || null;
     }
-
     if (estado !== undefined) {
-      datosActualizar.estado = true;
+      datosActualizar.estado = estado; // usar el valor enviado
     }
 
-    // Si no hay datos para actualizar
     if (Object.keys(datosActualizar).length === 0) {
-      return res.status(400).json({
-        message: "No se proporcionaron datos para actualizar"
-      });
+      return res.status(400).json({ message: "No se proporcionaron datos para actualizar" });
     }
 
-    // Actualizar el edificio
     const edificioActualizado = await edificiosService.update(id, datosActualizar);
-
-    res.json({
-      message: "Edificio actualizado exitosamente",
-      data: edificioActualizado
-    });
-
+    res.json({ message: "Edificio actualizado exitosamente", data: edificioActualizado });
   } catch (err) {
     if (err.name === 'SequelizeValidationError') {
       return res.status(400).json({
@@ -201,32 +157,22 @@ const update = async (req, res, next) => {
   }
 };
 
-// Eliminar (desactivar) edificio
+// Remove (toggle estado)
 const remove = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ 
-        message: 'ID inválido',
-        error: 'El ID debe ser un número válido'
-      });
+      return res.status(400).json({ message: 'ID inválido', error: 'El ID debe ser un número válido' });
     }
 
-    // Verificar que el edificio exista
     const edificio = await edificiosService.getById(id);
     if (!edificio) {
-      return res.status(404).json({ 
-        message: 'Edificio no encontrado',
-        id: id
-      });
+      return res.status(404).json({ message: 'Edificio no encontrado', id });
     }
 
-    // Verificar si el edificio tiene aulas asociadas antes de eliminar
-    const Aula = require('../aulas/aula.model'); // Importar modelo Aula
-    const aulasAsociadas = await Aula.count({
-      where: { edificioId: id }
-    });
-
+    // Si quieres bloquear eliminación física por aulas:
+    const Aula = require('../aulas/aula.model');
+    const aulasAsociadas = await Aula.count({ where: { edificioId: id } });
     if (aulasAsociadas > 0) {
       return res.status(409).json({
         message: "No se puede eliminar el edificio porque tiene aulas asociadas",
@@ -235,45 +181,29 @@ const remove = async (req, res, next) => {
       });
     }
 
-    // Eliminar físicamente el edificio
-    await edificiosService.remove(id);
-    
-    res.status(204).end();
+    const actualizado = await edificiosService.remove(id);
+    res.json({ message: "Estado alternado exitosamente", data: actualizado });
 
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
-// Desactivar edificio (soft delete)
+// Deactivate (explicit)
 const deactivate = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ 
-        message: 'ID inválido',
-        error: 'El ID debe ser un número válido'
-      });
+      return res.status(400).json({ message: 'ID inválido', error: 'El ID debe ser un número válido' });
     }
-
     const edificio = await edificiosService.getById(id);
     if (!edificio) {
-      return res.status(404).json({ 
-        message: 'Edificio no encontrado',
-        id: id
-      });
+      return res.status(404).json({ message: 'Edificio no encontrado', id });
     }
-
-    // Desactivar el edificio (cambiar estado a false)
-    const edificioDesactivado = await edificiosService.update(id, { activo: false });
-    
-    res.json({
-      message: "Edificio desactivado exitosamente",
-      data: edificioDesactivado
-    });
-
-  } catch (err) { 
-    next(err); 
+    const edificioDesactivado = await edificiosService.update(id, { estado: false });
+    res.json({ message: "Edificio desactivado exitosamente", data: edificioDesactivado });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -282,7 +212,7 @@ const getAulasByEdificio = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'ID inválido',
         error: 'El ID debe ser un número válido'
       });
@@ -290,9 +220,9 @@ const getAulasByEdificio = async (req, res, next) => {
 
     const edificio = await edificiosService.getById(id);
     if (!edificio) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: 'Edificio no encontrado',
-        id: id
+        id
       });
     }
 
@@ -311,21 +241,21 @@ const getAulasByEdificio = async (req, res, next) => {
         nombre: edificio.nombre,
         ubicacion: edificio.ubicacion
       },
-      aulas: aulas,
+      aulas,
       count: aulas.length
     });
 
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
-module.exports = { 
-  list, 
-  getOne, 
-  create, 
-  update, 
-  remove, 
+module.exports = {
+  list,
+  getOne,
+  create,
+  update,
+  remove,
   deactivate,
-  getAulasByEdificio 
+  getAulasByEdificio
 };
