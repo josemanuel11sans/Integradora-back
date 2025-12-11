@@ -16,12 +16,15 @@ const getAll = async () => {
 };
 
 // Obtener espacios por tutor
-const getByTutor = async (tutorId) => {
+const getByTutor = async (tutorId, estadoFilter = true) => {
+  const where = { tutor_id: tutorId };
+  // si viene null/undefined, no filtramos por estado (trae todos)
+  if (estadoFilter !== undefined && estadoFilter !== null) {
+    where.estado = estadoFilter;
+  }
+
   return await Espacio.findAll({
-    where: { 
-      tutor_id: tutorId,
-      estado: true 
-    },
+    where,
     order: [['createdAt', 'DESC']]
   });
 };
@@ -157,6 +160,7 @@ const getByTutor2 = async (tutorId) => {
     order: [['createdAt', 'DESC']]
   });
 };
+
 
 
 module.exports = {

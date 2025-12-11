@@ -11,9 +11,23 @@ const list = async (req, res, next) => {
 };
 
 // Listar espacios de un tutor específico
+// en espacios.controller.js (listByTutor)
 const listByTutor = async (req, res, next) => {
   try {
-    const espacios = await espaciosService.getByTutor(req.params.tutorId);
+    const { estado, includeDeleted } = req.query;
+
+    // prioridad: si mandas estado=0 o estado=1 lo usamos literal
+    // si mandas includeDeleted=true pedimos estado=false
+    let estadoFilter;
+    if (estado !== undefined) {
+      estadoFilter = estado === '0' || estado === 'false' ? false : true;
+    } else if (includeDeleted === 'true') {
+      estadoFilter = false;
+    } else {
+      estadoFilter = true; // default: solo activos
+    }
+
+    const espacios = await espaciosService.getByTutor(req.params.tutorId, estadoFilter);
     res.json(espacios);
   } catch (err) {
     next(err);
@@ -132,6 +146,8 @@ const hardRemove = async (req, res, next) => {
     next(err);
   }
 };
+
+
 
 module.exports = {
   list,
