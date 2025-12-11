@@ -1,29 +1,26 @@
 // src/controllers/file.controller.js
-const File = require("./clud.model");
-// Este es el mas interesante 
-// Esta funcion se encarga de guardar cada uno de los archivos en la nube
-// utilixando la api de cloudinari
+const File = require("./clud.model"); // ajusta la ruta si tu modelo real está en otro archivo
+
+// Subir archivo
 const uploadFile = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No se subió ningún archivo" });
     }
-  // 🔐 Identificar al usuario dueño del archivo
-     const { usuarioId } = req.body;
-     const {espacioId} = req.body; //opcional
 
-     console.log("Usuario ID:", usuarioId);
-     console.log("Espacio ID:", espacioId);
-    // Guardar en DB
+    const { usuarioId, espacioId } = req.body;
+
+    console.log("Usuario ID:", usuarioId);
+    console.log("Espacio ID:", espacioId);
+
     const newFile = await File.create({
       publicId: req.file.filename,
       url: req.file.path,
       folder: req.file.folder || "general",
       mimetype: req.file.mimetype,
       originalName: req.file.originalname,
-      // usuarioId: req.user.id, //se guarda el usuario que lo esta guardando
-      usuarioId: usuarioId,
-      espacioId: espacioId,
+      usuarioId,
+      espacioId,
     });
 
     console.log("Archivo guardado en DB:", newFile);
@@ -38,9 +35,7 @@ const uploadFile = async (req, res) => {
   }
 };
 
-// Regresa todos los archivos en la nube
-// esta ruta solo es de pureba 
-// no cosumir ni agregar a la produccion
+// Regresa todos los archivos (incluye eliminados)
 const getFiles = async (req, res) => {
   try {
     const files = await File.findAll();
@@ -50,98 +45,120 @@ const getFiles = async (req, res) => {
   }
 };
 
-// 
-// esta funcion no trar los archivos por su publicId
+// Obtener por publicId
+const getFileByPublicId = async (req, res) => {
+  try {
+    const { publicId } = req.params;
+    const file = await File.findOne({ where: { publicId } });
 
-const getFileByPublicId = async (req, res) =>{
-  try{
-    const {publicId} = req.params;
-    const file = await File.findOne(
-      {
-        where:{
-          publicId
-        }
-      }
-    );
-
-    if(!file){
-      return res.status(404).json({error:"Archivo no encontrado"});
+    if (!file) {
+      return res.status(404).json({ error: "Archivo no encontrado" });
     }
 
     res.json(file);
-
-  }catch (error){
+  } catch (error) {
     console.log(error);
-    res.status(500).json({
-     error:"Error al buscar el archivo" 
-    });
+    res.status(500).json({ error: "Error al buscar el archivo" });
   }
-}
-// Obtener archivos por usuarioId
+};
+
+// Obtener archivos por usuarioId (solo activos)
 const getFilesByUsuarioId = async (req, res) => {
   try {
     const { usuarioId } = req.params;
 
     const files = await File.findAll({
-      where: { usuarioId }
+      where: { usuarioId, status: true },
     });
 
     if (files.length === 0) {
-      return res.status(404).json({ error: "No se encontraron archivos para este usuario" });
+      return res
+          .status(404)
+          .json({ error: "No se encontraron archivos para este usuario" });
     }
 
     res.json(files);
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener archivos por usuario" });
   }
 };
 
-//trae los archivos segun el id del espacio
+// Obtener archivos por espacioId (activos por defecto; incluir eliminados con ?includeDeleted=true)
 const getFilesByEspacioId = async (req, res) => {
   try {
     const { espacioId } = req.params;
+    const includeDeleted = req.query.includeDeleted === "true";
+
     const files = await File.findAll({
-      where: { espacioId }
+      where: { espacioId, ...(includeDeleted ? {} : { status: true }) },
     });
+
     if (files.length === 0) {
-      return res.status(404).json({ error: "No se encontraron archivos para este espacio" });
+      return res
+          .status(404)
+          .json({ error: "No se encontraron archivos para este espacio" });
     }
     res.json(files);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener archivos por espacio" });
   }
-}
+};
 
-//optener solo los archivos
-// Eliminar archivo: borra de Cloudinary y de la base de datos
+// Eliminar archivo: soft delete (status = false). Si quisieras borrar en Cloudinary, descomenta la parte indicada.
 const deleteFileById = async (req, res) => {
   try {
     const { id } = req.params;
     const file = await File.findByPk(id);
     if (!file) {
-      return res.status(404).json({ error: 'Archivo no encontrado' });
+      return res.status(404).json({ error: "Archivo no encontrado" });
     }
 
-    // Borrar de Cloudinary (por publicId)
-    const cloudinary = require('./cloudinary');
-    try {
-      await cloudinary.uploader.destroy(file.publicId, { resource_type: 'auto' });
-    } catch (err) {
-      // Loguear pero no impedir la eliminación en BD
-      console.error('Error al eliminar en Cloudinary:', err);
-    }
+    // Soft delete
+    file.status = false;
+    await file.save();
 
-    // Borrar registro en BD
-    await file.destroy();
+    // Si prefieres borrar también de Cloudinary, descomenta:
+    // const cloudinary = require("./cloudinary");
+    // try {
+    //   await cloudinary.uploader.destroy(file.publicId, { resource_type: "auto" });
+    // } catch (err) {
+    //   console.error("Error al eliminar en Cloudinary:", err);
+    // }
 
-    res.json({ message: 'Archivo eliminado correctamente' });
+    res.json({ message: "Archivo marcado como eliminado" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al eliminar archivo' });
+    res.status(500).json({ error: "Error al eliminar archivo" });
   }
 };
 
-module.exports = { uploadFile, getFiles, getFileByPublicId, getFilesByUsuarioId, getFilesByEspacioId, deleteFileById };
+// Restaurar archivo: status = true
+const restoreFileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const file = await File.findByPk(id);
+    if (!file) {
+      return res.status(404).json({ error: "Archivo no encontrado" });
+    }
+
+    file.status = true;
+    await file.save();
+
+    res.json({ message: "Archivo restaurado", file });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al restaurar archivo" });
+  }
+};
+
+module.exports = {
+  uploadFile,
+  getFiles,
+  getFileByPublicId,
+  getFilesByUsuarioId,
+  getFilesByEspacioId,
+  deleteFileById,
+  restoreFileById,
+};

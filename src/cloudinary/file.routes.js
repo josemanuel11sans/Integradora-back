@@ -2,7 +2,15 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("./upload");
-const { uploadFile, getFileByPublicId ,getFiles,getFilesByUsuarioId, getFilesByEspacioId, deleteFileById } = require("./file.controller");
+const {
+    uploadFile,
+    getFileByPublicId,
+    getFiles,
+    getFilesByUsuarioId,
+    getFilesByEspacioId, // debe soportar ?includeDeleted=true en el controlador
+    deleteFileById,       // ahora debería marcar status=false (soft delete)
+    restoreFileById,      // nuevo: status=true
+} = require("./file.controller");
 
 /**
  * @swagger
@@ -11,89 +19,25 @@ const { uploadFile, getFileByPublicId ,getFiles,getFilesByUsuarioId, getFilesByE
  *   description: Endpoints para subir y consultar archivos en la nube
  */
 
-
-/**
- * @swagger
- * /api/files/upload:
- *   post:
- *     summary: Subir un archivo a Cloudinary
- *     tags: [Cloudinary]
- *     description: Sube un archivo usando multipart/form-data.
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               file:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Archivo subido correctamente.
- *       400:
- *         description: Error al subir el archivo.
- */
 // 👇 permite 1 archivo (key: "file")
 router.post("/upload", upload.single("file"), uploadFile);
-/**
- * @swagger
- * /api/files/all:
- *   get:
- *     summary: Obtener todos los archivos de Cloudinary
- *     tags: [Cloudinary]
- *     description: Devuelve todos los archivos almacenados en Cloudinary.  
- *                  **Nota:** No consumir desde frontend.
- *     responses:
- *       200:
- *         description: Lista de archivos recuperada correctamente.
- */
-//ruta para traer todos los archivos de la nube
-//Nota: no consumir
+
+// Nota: no consumir desde frontend
 router.get("/all", getFiles);
-/**
- * @swagger
- * /api/files/file/{publicId}:
- *   get:
- *     summary: Obtener un archivo específico
- *     tags: [Cloudinary]
- *     description: Busca un archivo por su `publicId`.
- *     parameters:
- *       - in: path
- *         name: publicId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID público del archivo en Cloudinary.
- *     responses:
- *       200:
- *         description: Archivo recuperado correctamente.
- *       404:
- *         description: Archivo no encontrado.
- */
+
+// Obtener por publicId
 router.get("/file/:publicId", getFileByPublicId);
 
-/**
- * @swagger
- * /api/files/user/{usuarioId}:
- *   get:
- *     summary: Obtener archivos por ID de usuario
- *     tags: [Cloudinary]
- *     parameters:
- *       - in: path
- *         name: usuarioId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID del usuario dueño de los archivos.
- */
+// Archivos por usuario
 router.get("/user/:usuarioId", getFilesByUsuarioId);
 
+// Archivos por espacio (usa ?includeDeleted=true para traer también eliminados)
 router.get("/espacio/:espacioId", getFilesByEspacioId);
 
-// Eliminar archivo por id (borra también en Cloudinary)
-router.delete('/:id', deleteFileById);
+// Eliminar archivo por id (soft delete: status=false)
+router.delete("/:id", deleteFileById);
 
+// Restaurar archivo (status=true)
+router.put("/:id/restore", restoreFileById);
 
 module.exports = router;

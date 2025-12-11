@@ -18,13 +18,25 @@ const getAll = async () => {
 // Obtener espacios por tutor
 const getByTutor = async (tutorId, estadoFilter = true) => {
   const where = { tutor_id: tutorId };
-  // si viene null/undefined, no filtramos por estado (trae todos)
   if (estadoFilter !== undefined && estadoFilter !== null) {
     where.estado = estadoFilter;
   }
 
   return await Espacio.findAll({
     where,
+    attributes: {
+      include: [
+        [
+          Espacio.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM cloudinary
+            WHERE cloudinary.espacioId = Espacio.id_espacio
+              AND (cloudinary.status = 1 OR cloudinary.status = TRUE)
+          )`),
+          'materialesCount'
+        ]
+      ]
+    },
     order: [['createdAt', 'DESC']]
   });
 };
