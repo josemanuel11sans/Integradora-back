@@ -27,7 +27,7 @@ Asesorias.init({
   },
   activo: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    defaultValue: false,
     allowNull: false
   },
   comentarios: {
@@ -55,6 +55,10 @@ Asesorias.init({
     allowNull: false
   },
   carrera_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  espacio_id: {
     type: DataTypes.INTEGER,
     allowNull: true
   },

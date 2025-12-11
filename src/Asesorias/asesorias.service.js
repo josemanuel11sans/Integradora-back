@@ -157,9 +157,62 @@ const getAsesoriasByCarrera = async (carreraId) => {
   });
 }
 
+/*
+Obtener asesorias por espacio
+Roles: student, tutor, coordinador
+FPK: espacio_id
+*/
+const getAsesoriasByEspacio = async (espacioId) => {
+  return await Asesoria.findAll({
+    where: { espacio_id: espacioId },
+    include: [
+      {
+        model: Usuario,
+        as: 'estudiante',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Usuario,
+        as: 'tutor',
+        attributes: ['id_usuario', 'nombre', 'apellido', 'email']
+      },
+      {
+        model: Carrera,
+        as: 'carrera',
+        attributes: ['id_carrera', 'nombre_carrera']
+      }
+    ],
+    order: [['fecha_asesoria', 'DESC']]
+  });
+}
+
+/*
+Aceptar o rechazar asesoria
+Roles: tutor, coordinador
+FPK: id_asesoria
+Parametro: aceptada (boolean) - true para aceptar, false para rechazar
+*/
+const updateAsesoriaStatus = async (asesoriaId, aceptada) => {
+  const asesoria = await Asesoria.findByPk(asesoriaId);
+  if (!asesoria) return null;
+  return await asesoria.update({ activo: aceptada });
+};
+
+/*
+Marcar asistencia de asesoria
+Roles: tutor, coordinador
+FPK: id_asesoria
+Parametro: asistencia (boolean) - true si asistió, false si no asistió
+*/
+const updateAsistencia = async (asesoriaId, asistencia) => {
+  const asesoria = await Asesoria.findByPk(asesoriaId);
+  if (!asesoria) return null;
+  return await asesoria.update({ asistencia: asistencia });
+};
+
 
 module.exports = { getAll, getById, createAsesoria, updateAsesoria, deleteAsesoria,
 getAsesoriasByStudent, getAsesoriasByTutor, getAsesoriasByMateria,
-getAsesoriasByCarrera,
+getAsesoriasByCarrera, getAsesoriasByEspacio, updateAsesoriaStatus, updateAsistencia,
 }; 
 // Exporta todas las funciones del servicio

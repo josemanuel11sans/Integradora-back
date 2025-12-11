@@ -27,6 +27,15 @@ router.get('/materia/:materia_id', authenticate, authorizeRoles('student','tutor
 // Obtener asesorias por carrera
 router.get('/carrera/:carrera_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByCarrera);
 
+// Obtener asesorias por espacio
+router.get('/espacio/:espacio_id', authenticate, authorizeRoles('student','tutor', 'coordinator'), asesoriaController.getByEspacio);
+
+// Aceptar o rechazar asesoria
+router.put('/:id/status', authenticate, authorizeRoles('tutor', 'coordinator'), asesoriaController.updateStatus);
+
+// Marcar asistencia de asesoria
+router.put('/:id/attendance', authenticate, authorizeRoles('tutor', 'coordinator'), asesoriaController.markAttendance);
+
 module.exports = router; 
 // Exporta el router para usarlo en la app principal
 

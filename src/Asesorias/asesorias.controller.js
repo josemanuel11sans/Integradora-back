@@ -173,7 +173,73 @@ const getByCarrera = async (req, res, next) => {
   } catch (err) { next(err); }
 }
 
+/*
+Obtener asesorias por espacio
+Roles: student, tutor, coordinador
+FPK: espacio_id
+*/
+const getByEspacio = async (req, res, next) => {
+  try {
+    const espacioId = req.params.espacio_id;
+    const asesorias = await asesoriasService.getAsesoriasByEspacio(espacioId);
+    if (asesorias.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron asesorías para este espacio' });
+    }
+    res.json(asesorias);
+  } catch (err) { next(err); }
+}
+
+/*
+Aceptar o rechazar asesoria
+Roles: tutor, coordinador
+Parametros: id (path) - id de la asesoria
+Body: { aceptada: boolean } - true para aceptar, false para rechazar
+*/
+const updateStatus = async (req, res, next) => {
+  try {
+    const asesoriaId = req.params.id;
+    const { aceptada } = req.body || {};
+
+    if (aceptada === undefined || typeof aceptada !== 'boolean') {
+      return res.status(400).json({ message: 'El parámetro aceptada es requerido y debe ser un booleano (true o false)' });
+    }
+
+    const asesoriaActualizada = await asesoriasService.updateAsesoriaStatus(asesoriaId, aceptada);
+    if (!asesoriaActualizada) {
+      return res.status(404).json({ message: 'Asesoría no encontrada' });
+    }
+
+    const mensaje = aceptada ? 'Asesoría aceptada correctamente' : 'Asesoría rechazada correctamente';
+    res.json({ message: mensaje, asesoria: asesoriaActualizada });
+  } catch (err) { next(err); }
+}
+
+/*
+Marcar asistencia de asesoria
+Roles: tutor, coordinador
+Parametros: id (path) - id de la asesoria
+Body: { asistencia: boolean } - true si asistió, false si no asistió
+*/
+const markAttendance = async (req, res, next) => {
+  try {
+    const asesoriaId = req.params.id;
+    const { asistencia } = req.body || {};
+
+    if (asistencia === undefined || typeof asistencia !== 'boolean') {
+      return res.status(400).json({ message: 'El parámetro asistencia es requerido y debe ser un booleano (true o false)' });
+    }
+
+    const asesoriaActualizada = await asesoriasService.updateAsistencia(asesoriaId, asistencia);
+    if (!asesoriaActualizada) {
+      return res.status(404).json({ message: 'Asesoría no encontrada' });
+    }
+
+    const mensaje = asistencia ? 'Asistencia marcada como presente' : 'Asistencia marcada como ausente';
+    res.json({ message: mensaje, asesoria: asesoriaActualizada });
+  } catch (err) { next(err); }
+}
+
 module.exports = { list, getOne, create, update, remove,
-getByStudent, getByTutor, getByMateria, getByCarrera, getAll
+getByStudent, getByTutor, getByMateria, getByCarrera, getByEspacio, getAll, updateStatus, markAttendance
 }; 
 // Exporta todas las funciones del controlador para ser usadas en las rutas
