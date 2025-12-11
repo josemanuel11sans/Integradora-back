@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const controller = require("./alumnoEspacio.controller");
 
+
+
 const authenticate = require("../auth/middlewares/authenticate");
 const authorizeRoles = require("../auth/middlewares/authorizeRoles");
 
@@ -36,5 +38,14 @@ router.get(
   authorizeRoles("student", "tutor", "coordinator", "admin"),
   controller.espaciosDeAlumno
 );
+
+
+router.get(
+  "/alumno/:alumnoId/carrera",
+  authenticate,
+  authorizeRoles("student", "coordinator", "admin"),
+  controller.getEspaciosPorCarreraDeAlumno
+);
+
 
 module.exports = router;

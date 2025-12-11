@@ -70,9 +70,21 @@ const espaciosDeAlumno = async (req, res, next) => {
   }
 };
 
+const getEspaciosPorCarreraDeAlumno = async (req, res, next) => {
+  try {
+    const { alumnoId } = req.params;
+    const espacios = await alumnoEspacioService.getEspaciosPorCarreraDeAlumno(alumnoId);
+
+    res.json(espacios);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   inscribir,
   desinscribir,
   alumnosDeEspacio,
-  espaciosDeAlumno
+  espaciosDeAlumno,
+  getEspaciosPorCarreraDeAlumno,
 };

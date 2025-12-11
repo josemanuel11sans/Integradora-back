@@ -1,6 +1,8 @@
 const Usuario = require("../Usuarios/usuarios.model");
 const Espacio = require("../espacios/espacios.model");
 const AlumnoEspacio = require("./alumnoEspacio.model");
+const Materia = require('../materias/materias.model');
+const Carrera = require('../Carreras/carreras.model');
 
 // Inscribir alumno en espacio
 const inscribirAlumno = async (alumnoId, espacioId) => {
@@ -56,9 +58,47 @@ const getEspaciosDeAlumno = async (alumnoId) => {
   });
 };
 
+const getEspaciosPorCarreraDeAlumno = async (alumnoId) => {
+  // Obtener alumno
+  const alumno = await Usuario.findByPk(alumnoId);
+
+  if (!alumno) {
+    throw new Error("Alumno no encontrado");
+  }
+
+  if (alumno.role !== "student") {
+    throw new Error("El usuario no es alumno");
+  }
+
+  if (!alumno.carrera_id) {
+    throw new Error("El alumno no tiene carrera asignada");
+  }
+
+  // Buscar espacios cuya materia pertenezca a la MISMA carrera del alumno
+  return await Espacio.findAll({
+    where: { estado: true },
+    include: [
+      {
+        model: Materia,
+        as: "materia",
+        required: true,
+        where: { carrera_id: alumno.carrera_id },
+        attributes: ["id_materia", "nombre_materia", "carrera_id"]
+      },
+      {
+        model: Usuario,
+        as: "tutor",
+        attributes: ["id_usuario", "nombre", "apellido", "email"]
+      }
+    ],
+    order: [["createdAt", "DESC"]]
+  });
+};
+
 module.exports = {
   inscribirAlumno,
   desinscribirAlumno,
   getAlumnosDeEspacio,
-  getEspaciosDeAlumno
+  getEspaciosDeAlumno,
+  getEspaciosPorCarreraDeAlumno,
 };

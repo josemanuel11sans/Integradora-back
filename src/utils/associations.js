@@ -89,4 +89,18 @@ Espacio.belongsToMany(Usuario, {
   otherKey: "alumno_id",
 });
 
+// Espacio → Materia
+Espacio.belongsTo(Materia, {
+  foreignKey: "materia_id",
+  targetKey: "id_materia",
+  as: "materia",
+});
+
+Materia.hasMany(Espacio, {
+  foreignKey: "materia_id",
+  sourceKey: "id_materia",
+  as: "espacios",
+});
+
+
 module.exports = { Usuario, File, Espacio, Asesoria, Carrera, Materia };
