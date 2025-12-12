@@ -82,7 +82,7 @@ const update = async (req, res, next) => {
     }
 
     const existente = await carrerasService.getById(id);
-    if (!existente || !existente.activo) {
+    if (!existente) {  // ✅ Solo verifica que exista, NO que sea activo
       return res.status(404).json({ message: 'Carrera no encontrada' });
     }
 

@@ -1,9 +1,10 @@
 const Carrera = require('./carreras.model');
 
+// En carreras.service.js - REEMPLAZA getAll():
 const getAll = async () => {
   return await Carrera.findAll({
     order: [['nombre_carrera', 'ASC']],
-    where: { activo: true },
+    // SIN el where: { activo: true } - traemos TODAS
   });
 };
 
@@ -23,9 +24,8 @@ const createCarrera = async (data) => {
 
 const updateCarrera = async (id, data) => {
   const carrera = await Carrera.findByPk(id);
-  if (!carrera || !carrera.activo) throw new Error('Carrera not found');
+  if (!carrera) throw new Error('Carrera not found');  // ✅ Solo verifica que exista
 
-  // solo permitimos actualizar estos campos
   const payload = {};
   if (data.nombre_carrera !== undefined) payload.nombre_carrera = data.nombre_carrera;
   if (data.division !== undefined) payload.division = data.division;
