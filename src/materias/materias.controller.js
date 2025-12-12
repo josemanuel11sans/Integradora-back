@@ -46,15 +46,30 @@ const update = async (req, res, next) => {
   } catch (err) { next(err); }
 }
 
+// materias.controller.js
 const remove = async (req, res, next) => {
-  try {
-    const materia = await materiasService.getById(req.params.id);
-    if (!materia) return res.status(404).json({ message: 'Materia no encontrada o inactiva' });
-    await materiasService.deleteMateria(req.params.id);  // Esto marca la materia como inactiva
-    res.status(204).end();  // Respondemos con éxito sin contenido
-  } catch (err) {
-    next(err);
-  }
+    try {
+        const { id } = req.params;
+
+        // Validar existencia sin filtrar por activo
+        const materia = await materiasService.getByIdIncluyendoInactivas
+            ? await materiasService.getByIdIncluyendoInactivas(id)
+            : await require('./materias.model').findByPk(id);
+
+        if (!materia) {
+            return res.status(404).json({ message: 'Materia no encontrada' });
+        }
+
+        const materiaActualizada = await materiasService.deleteMateria(id);
+        const estadoTexto = materiaActualizada.activo ? 'activada' : 'desactivada';
+
+        return res.status(200).json({
+            message: `Materia ${estadoTexto} correctamente`,
+            data: materiaActualizada
+        });
+    } catch (err) {
+        next(err);
+    }
 };
 
 const getByCarrera = async (req, res, next) => {
@@ -68,4 +83,4 @@ const getByCarrera = async (req, res, next) => {
   } catch (err) {next(err);}
 };
 
-module.exports = { list, listActive ,getOne, create, update, remove, getByCarrera };
+module.exports = { list, listActive, getOne, create, update, remove, getByCarrera };

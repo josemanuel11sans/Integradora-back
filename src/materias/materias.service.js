@@ -53,11 +53,15 @@ const updateMateria = async (id, data) => {
 
 
 const deleteMateria = async (id) => {
-  const materia = await Materia.findByPk(id);
-  if (!materia || !materia.activo) throw new Error('Materia not found');
-  await materia.update({ activo: false });
-  return materia;
-}
+    const materia = await Materia.findByPk(id);
+    if (!materia) throw new Error('Materia not found');
+
+    // Toggle lógico: si está activa, desactiva; si está inactiva, activa
+    const nuevoEstado = !materia.activo;
+    await materia.update({ activo: nuevoEstado });
+
+    return materia;
+};
 
 
 const getMateriasByCarreraId = async (carreraId) => {
