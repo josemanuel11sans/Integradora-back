@@ -4,6 +4,8 @@ const Asesoria = require('./asesorias.model');
 const Carrera = require('../Carreras/carreras.model');
 const Usuario = require('../Usuarios/usuarios.model');
 // Importa el modelo Asesoria
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const getAll = async () => {
   return await Asesoria.findAll({
@@ -40,7 +42,7 @@ const updateAsesoria = async (id, data) => {
   if (!Asesoria) return null; 
   // Si no existe, devuelve null
   return await Asesoria.update(data); 
-  // Actualiza el Asesoria con los datos proporcionados
+  // Actualiza el Asesoria with los datos proporcionados
 };
 
 const deleteAsesoria = async (id) => {
@@ -210,9 +212,38 @@ const updateAsistencia = async (asesoriaId, asistencia) => {
   return await asesoria.update({ asistencia: asistencia });
 };
 
+const sendConfirmationEmail = async (email, nombreAlumno, fechaAsesoria) => {
+  await resend.emails.send({
+    from: "TutorHub <noreply@tutorhub.click>",
+    to: email,
+    subject: "Confirmación de Asesoría",
+    html: `
+      <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #f4f6fb; padding: 40px 0;">
+        <div style="max-width: 520px; margin: auto; background: #ffffff; border-radius: 14px; padding: 35px; box-shadow: 0 6px 18px rgba(0,0,0,0.08);">
+          <h2 style="color: #1f2d59; text-align: center; font-size: 26px; margin-bottom: 8px;">
+            ¡Tu asesoría ha sido confirmada!
+          </h2>
+          <p style="color: #4a4a4a; text-align: center; font-size: 15px; margin: 0;">
+            Hola ${nombreAlumno}, tu asesoría ha sido confirmada para la fecha: <strong>${fechaAsesoria}</strong>.
+          </p>
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="https://tutorhub.click" style="display: inline-block; padding: 12px 25px; background: #3a57e8; color: #fff; text-decoration: none; border-radius: 8px; font-size: 15px;">
+              Ver detalles
+            </a>
+          </div>
+          <hr style="margin: 30px 0; border: none; border-bottom: 1px solid #eee;" />
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Si no solicitaste esta asesoría, puedes ignorar este mensaje.
+          </p>
+        </div>
+      </div>
+    `,
+  });
+};
 
 module.exports = { getAll, getById, createAsesoria, updateAsesoria, deleteAsesoria,
 getAsesoriasByStudent, getAsesoriasByTutor, getAsesoriasByMateria,
 getAsesoriasByCarrera, getAsesoriasByEspacio, updateAsesoriaStatus, updateAsistencia,
+sendConfirmationEmail, 
 }; 
 // Exporta todas las funciones del servicio

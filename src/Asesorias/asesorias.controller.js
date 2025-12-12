@@ -2,6 +2,7 @@
 
 const { get } = require('./asesorias.routes');
 const asesoriasService = require('./asesorias.service'); 
+const Usuario = require("../Usuarios/usuarios.model");
 // Importa las funciones del servicio de asesorias, que interactúan con la base de datos
 
 const getAll = async (req, res, next) => {
@@ -195,8 +196,12 @@ Roles: tutor, coordinador
 Parametros: id (path) - id de la asesoria
 Body: { aceptada: boolean } - true para aceptar, false para rechazar
 */
+const { sendConfirmationEmail } = require("./asesorias.service");
+
 const updateStatus = async (req, res, next) => {
+  console.log("Entrando a updateStatus");
   try {
+    console.log("Parametros recibidos:", req.params);
     const asesoriaId = req.params.id;
     const { aceptada } = req.body || {};
 
@@ -205,8 +210,17 @@ const updateStatus = async (req, res, next) => {
     }
 
     const asesoriaActualizada = await asesoriasService.updateAsesoriaStatus(asesoriaId, aceptada);
+    console.log(asesoriaActualizada , "Asesoría actualizada");
     if (!asesoriaActualizada) {
       return res.status(404).json({ message: 'Asesoría no encontrada' });
+    }
+  
+    if (aceptada) {
+      console.log("Enviando correo de confirmación",aceptada);
+     console.log(asesoriaActualizada.dataValues.estudiante_id, "ID Estudiante");
+      const alumno = await Usuario.findByPk(asesoriaActualizada.dataValues.estudiante_id);
+       console.log(alumno)
+      await sendConfirmationEmail(alumno.email, alumno.nombre, asesoriaActualizada.fecha_asesoria);
     }
 
     const mensaje = aceptada ? 'Asesoría aceptada correctamente' : 'Asesoría rechazada correctamente';
