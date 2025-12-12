@@ -1,26 +1,23 @@
-const express = require('express'); 
-// Importa Express
-const router = express.Router(); 
-// Crea un router de Express
-const carreraController = require('./carreras.controller'); 
-// Importa el controlador de carreras
+const express = require('express');
+const router = express.Router();
+const carreraController = require('./carreras.controller');
 
 const authenticate = require('../auth/middlewares/authenticate');
 const authorizeRoles = require('../auth/middlewares/authorizeRoles');
 
-//crear una carrera
+// Crear carrera
 router.post('/create', carreraController.create);
 
-//obtener todas las carreras
+// Obtener todas las carreras
 router.get('/', carreraController.list);
 
-//obtener una carrera por id
-router.get('/:id', carreraController.getOne);
-
-//actualizar una carrera por id
+// Actualizar carrera por id
 router.put('/update/:id', carreraController.update);
 
-//eliminar una carrera por id
-router.delete('/:id', carreraController.remove);
+// Eliminar/toggle carrera por id (coincide con front: /delete/:id)
+router.delete('/delete/:id', carreraController.remove);
+
+// Obtener una carrera por id
+router.get('/:id', carreraController.getOne);
 
 module.exports = router;

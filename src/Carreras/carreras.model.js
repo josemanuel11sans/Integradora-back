@@ -17,6 +17,11 @@ Carreras.init(
         len: { args: [2, 100], msg: "El nombre de la carrera debe tener entre 2 y 100 caracteres" }
       }
     },
+      // carreras.model.js (o similar)
+      division: {
+          type: DataTypes.ENUM('DATIC', 'DAMI', 'TALLER PESADO'),
+          allowNull: false
+      },
     activo: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
