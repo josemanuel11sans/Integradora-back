@@ -9,7 +9,9 @@ const list = async (req, res, next) => {
     // Llama al servicio para obtener todos los usuarios activos
     res.json(usuarios);
     // Devuelve la lista de usuarios en formato JSON
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
   // Si ocurre un error, lo pasa al middleware de manejo de errores
 };
 
@@ -21,7 +23,9 @@ const getOne = async (req, res, next) => {
     // Si no se encuentra el usuario, responde con 404
     res.json(usuario);
     // Devuelve el usuario encontrado
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
   // Manejo de errores
 };
 
@@ -29,11 +33,18 @@ const create = async (req, res, next) => {
   try {
     const nuevoUsuario = await usuariosService.createUsuario(req.body);
     // Llama al servicio para crear un nuevo usuario con los datos del body
-    // oculta el password
-    const { password, ...safe } = nuevoUsuario.toJSON();
+
+    // El servicio ya excluye el password, pero por seguridad adicional:
+    const { password, ...safe } = nuevoUsuario.toJSON ? nuevoUsuario.toJSON() : nuevoUsuario;
     res.status(201).json(safe);
     // Devuelve el usuario creado con código 201 (Created) sin el password
-  } catch (err) { next(err); }
+  } catch (err) {
+    // Manejo de errores específicos
+    if (err.message && err.message.includes('Ya existe un usuario con ese email')) {
+      return res.status(400).json({ message: err.message });
+    }
+    next(err);
+  }
   // Manejo de errores
 };
 
@@ -44,11 +55,13 @@ const update = async (req, res, next) => {
     if (!usuarioActualizado) return res.status(404).json({ message: 'Usuario no encontrado' });
     // Si no se encuentra el usuario, responde con 404
 
-    // oculta el password en la respuesta
-    const { password, ...safe } = usuarioActualizado.toJSON();
+    // El servicio ya excluye el password, pero por seguridad adicional:
+    const { password, ...safe } = usuarioActualizado.toJSON ? usuarioActualizado.toJSON() : usuarioActualizado;
     res.json(safe);
     // Devuelve el usuario actualizado sin el password
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
   // Manejo de errores
 };
 
@@ -58,9 +71,13 @@ const remove = async (req, res, next) => {
     // Llama al servicio para eliminar lógicamente un usuario por id
     if (!usuarioEliminado) return res.status(404).json({ message: 'Usuario no encontrado' });
     // Si no existe, devuelve 404
-    res.json({ message: 'Usuario eliminado correctamente' });
-    // Devuelve mensaje de éxito
-  } catch (err) { next(err); }
+
+    const mensaje = usuarioEliminado.estado ? 'Usuario activado correctamente' : 'Usuario desactivado correctamente';
+    res.json({ message: mensaje, data: usuarioEliminado });
+    // Devuelve mensaje de éxito con el estado actualizado
+  } catch (err) {
+    next(err);
+  }
   // Manejo de errores
 };
 
@@ -72,13 +89,16 @@ const restore = async (req, res, next) => {
     // Si no existe, devuelve 404
     res.json({ message: 'Usuario restaurado correctamente' });
     // Devuelve mensaje de éxito
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
   // Manejo de errores
 };
 
 const getByRole = async (req, res, next) => {
   try {
     const usuarios = await usuariosService.getByRole(req.params.role);
+    // Obtiene usuarios filtrados por rol con su carrera
     res.json(usuarios);
   } catch (err) {
     next(err);
@@ -88,6 +108,7 @@ const getByRole = async (req, res, next) => {
 const countByRole = async (req, res, next) => {
   try {
     const counts = await usuariosService.countByRole();
+    // Cuenta cuántos usuarios hay por cada rol
     res.json(counts);
   } catch (err) {
     next(err);

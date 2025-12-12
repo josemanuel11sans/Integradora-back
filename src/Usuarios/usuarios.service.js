@@ -1,5 +1,6 @@
 const Usuario = require('./usuarios.model');
-// Importa el modelo Usuario
+const Carrera = require('../carreras/carreras.model');
+// Importa los modelos Usuario y Carrera
 
 // usuarios.service.js -> createUsuario
 const bcrypt = require('bcrypt');
@@ -7,14 +8,32 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
 
 const getAll = async () => {
   return await Usuario.findAll({
-    where: { estado: true }
+    include: [
+      {
+        model: Carrera,
+        as: 'Carrera',
+        attributes: ['id_carrera', 'nombre_carrera'],
+        required: false // LEFT JOIN para mostrar usuarios sin carrera también
+      }
+    ],
+    attributes: { exclude: ['password'] }
   });
-  // Devuelve todos los usuarios activos de la base de datos
+  // Devuelve todos los usuarios activos de la base de datos con su carrera
 };
 
 const getById = async (id) => {
-  return await Usuario.findByPk(id);
-  // Busca un usuario por su primary key
+  return await Usuario.findByPk(id, {
+    include: [
+      {
+        model: Carrera,
+        as: 'Carrera',
+        attributes: ['id_carrera', 'nombre_carrera'],
+        required: false
+      }
+    ],
+    attributes: { exclude: ['password'] }
+  });
+  // Busca un usuario por su primary key con su carrera
 };
 
 const createUsuario = async (data) => {
@@ -37,6 +56,17 @@ const createEstudiante = async (data) => {
   if (data.role !== 'student') {
     throw new Error('El rol debe ser student para crear un estudiante');
   }
+
+  // Verificar si ya existe un usuario con el mismo email
+  const existe = await Usuario.findOne({ where: { email: data.email } });
+  if (existe) {
+    throw new Error('Ya existe un usuario con ese email');
+  }
+
+  // hash password
+  const hash = await bcrypt.hash(data.password, SALT_ROUNDS);
+  data.password = hash;
+
   return await Usuario.create(data);
 };
 
@@ -50,7 +80,20 @@ const updateUsuario = async (id, data) => {
     data.password = await bcrypt.hash(data.password, SALT_ROUNDS);
   }
 
-  return await usuario.update(data);
+  await usuario.update(data);
+
+  // Retorna el usuario actualizado con la relación Carrera
+  return await Usuario.findByPk(id, {
+    include: [
+      {
+        model: Carrera,
+        as: 'Carrera',
+        attributes: ['id_carrera', 'nombre_carrera'],
+        required: false
+      }
+    ],
+    attributes: { exclude: ['password'] }
+  });
 };
 
 const deleteUsuario = async (id) => {
@@ -75,7 +118,15 @@ const restoreUsuario = async (id) => {
 
 const getByRole = async (role) => {
   return await Usuario.findAll({
-    where: { role },
+    where: { role},
+    include: [
+      {
+        model: Carrera,
+        as: 'Carrera',
+        attributes: ['id_carrera', 'nombre_carrera'],
+        required: false // LEFT JOIN para mostrar usuarios sin carrera también
+      }
+    ],
     attributes: { exclude: ['password'] } // Excluye el password de la respuesta
   });
 };
